@@ -14,9 +14,10 @@ def visualize_wrapped(wrapped_json: str) -> str:
     """
     data = json.loads(wrapped_json) if isinstance(wrapped_json, str) else wrapped_json
     
+    year = data.get("year", 2025)
     output = []
     output.append("=" * 80)
-    output.append("🎮 LEAGUE OF LEGENDS WRAPPED 2024")
+    output.append(f"🎮 LEAGUE OF LEGENDS WRAPPED {year}")
     output.append("=" * 80)
     
     # Jugador
@@ -100,9 +101,58 @@ def visualize_wrapped(wrapped_json: str) -> str:
         output.append(f"\n⚠️  SIN ESTADÍSTICAS DE PARTIDAS")
         output.append(f"   No se encontraron partidas recientes para analizar.")
         output.append(f"   Esto puede ser porque:")
-        output.append(f"   - El jugador no tiene partidas en {data.get('year', 2024)}")
+        output.append(f"   - El jugador no tiene partidas en {year}")
         output.append(f"   - El historial de partidas está vacío")
         output.append(f"   - Las partidas no están disponibles en la API")
+    
+    # Desafíos
+    challenges = data.get("challenges")
+    if challenges and challenges.get("total_points", 0) > 0:
+        output.append(f"\n🏆 DESAFÍOS Y LOGROS:")
+        output.append(f"   Puntos Totales: {challenges.get('total_points', 0):,}")
+        
+        total_level = challenges.get('total_level', 'NONE')
+        if total_level != 'NONE':
+            level_names = {
+                "IRON": "Hierro", "BRONZE": "Bronce", "SILVER": "Plata",
+                "GOLD": "Oro", "PLATINUM": "Platino", "DIAMOND": "Diamante",
+                "MASTER": "Maestro", "GRANDMASTER": "Gran Maestro", "CHALLENGER": "Retador"
+            }
+            output.append(f"   Nivel Global: {level_names.get(total_level, total_level)}")
+        
+        # Percentile achievements
+        percentile_achievements = challenges.get("percentile_achievements", [])
+        if percentile_achievements:
+            output.append(f"\n   🌟 LOGROS DESTACADOS:")
+            top_1 = len([p for p in percentile_achievements if p["tier"] == "top_1_percent"])
+            top_5 = len([p for p in percentile_achievements if p["tier"] == "top_5_percent"])
+            top_10 = len([p for p in percentile_achievements if p["tier"] == "top_10_percent"])
+            
+            if top_1 > 0:
+                output.append(f"      ⭐ TOP 1%: {top_1} desafío(s)")
+            if top_5 > 0:
+                output.append(f"      🌟 TOP 5%: {top_5} desafío(s)")
+            if top_10 > 0:
+                output.append(f"      ✨ TOP 10%: {top_10} desafío(s)")
+        
+        # Category breakdown
+        category_breakdown = challenges.get("category_breakdown", {})
+        if category_breakdown:
+            output.append(f"\n   📊 CATEGORÍAS:")
+            category_names = {
+                "VETERANCY": "Veteranía",
+                "COLLECTION": "Colección",
+                "EXPERTISE": "Experticia",
+                "TEAMWORK": "Trabajo en Equipo",
+                "IMAGINATION": "Imaginación"
+            }
+            for category, data in list(category_breakdown.items())[:3]:
+                category_name = category_names.get(category, category)
+                level = data.get("level", "NONE")
+                points = data.get("current", 0)
+                percentile = data.get("percentile", 0)
+                if percentile > 0:
+                    output.append(f"      {category_name}: {level} ({points:,} pts, Top {int((1-percentile)*100)}%)")
     
     # Insights
     insights = data.get("insights", [])

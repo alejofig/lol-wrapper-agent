@@ -22,10 +22,22 @@ from mcp.server.fastmcp import FastMCP
 
 try:
     from .client import RiotAPIClient
-    from .analytics import analyze_match_history, generate_wrapped_insights, filter_matches_by_year
+    from .analytics import (
+        analyze_match_history, 
+        generate_wrapped_insights, 
+        filter_matches_by_year,
+        analyze_challenges,
+        generate_challenge_insights
+    )
 except ImportError:
     from lol_wrapper.client import RiotAPIClient
-    from lol_wrapper.analytics import analyze_match_history, generate_wrapped_insights, filter_matches_by_year
+    from lol_wrapper.analytics import (
+        analyze_match_history, 
+        generate_wrapped_insights, 
+        filter_matches_by_year,
+        analyze_challenges,
+        generate_challenge_insights
+    )
 
 # Cargar variables de entorno
 load_dotenv()
@@ -556,6 +568,102 @@ async def get_free_champion_rotation(
         }, indent=2)
 
 
+# ===== CHALLENGES API =====
+
+@mcp.tool()
+async def get_player_challenges(
+    game_name: str,
+    tag_line: str,
+    region: Optional[str] = None
+) -> str:
+    """
+    🏆 Obtiene todos los desafíos y logros de un jugador.
+    
+    Los desafíos son logros especiales de League of Legends que muestran
+    el progreso del jugador en diferentes categorías como:
+    - Veteranía (tiempo jugado, experiencia)
+    - Colección (campeones, skins)
+    - Experticia (maestría mecánica)
+    - Trabajo en Equipo (cooperación)
+    - Imaginación (creatividad en el juego)
+    
+    Args:
+        game_name: Nombre del invocador
+        tag_line: Tag del invocador (ej: LAN, NA1, KR1)
+        region: Región del servidor
+    
+    Returns:
+        JSON con:
+        - Puntos totales de desafíos
+        - Nivel global
+        - Top 5 desafíos por percentil
+        - Desglose por categoría
+        - Logros en percentiles altos (top 1%, 5%, 10%)
+        - Conteo de desafíos por nivel
+        - Insights motivacionales
+    
+    Example:
+        >>> get_player_challenges("Faker", "KR1", "kr")
+        {
+            "challenges": {
+                "total_points": 15000,
+                "total_level": "MASTER",
+                "top_challenges": [...],
+                "percentile_achievements": [
+                    {
+                        "challenge_id": 101101,
+                        "level": "GRANDMASTER",
+                        "percentile": 0.99,
+                        "tier": "top_1_percent"
+                    }
+                ],
+                "category_breakdown": {...},
+                "level_counts": {...}
+            },
+            "insights": [
+                "🏆 Acumulaste 15,000 puntos de desafíos!",
+                "⭐ ¡INCREÍBLE! Estás en el TOP 1% en 3 desafío(s)",
+                ...
+            ]
+        }
+    """
+    try:
+        region = normalize_region(region)
+        
+        # 1. Obtener PUUID del jugador
+        account = await client.get_summoner_by_name(game_name, tag_line, region)
+        puuid = account["puuid"]
+        
+        # 2. Obtener datos de desafíos
+        challenges_data = await client.get_player_challenges(puuid, region)
+        
+        # 3. Analizar desafíos
+        challenge_analysis = analyze_challenges(challenges_data)
+        
+        # 4. Generar insights
+        challenge_insights = generate_challenge_insights(challenge_analysis)
+        
+        # 5. Construir respuesta
+        result = {
+            "player": {
+                "game_name": account["gameName"],
+                "tag_line": account["tagLine"],
+                "puuid": puuid
+            },
+            "challenges": challenge_analysis,
+            "insights": challenge_insights
+        }
+        
+        return json.dumps(result, indent=2, ensure_ascii=False)
+        
+    except Exception as e:
+        return json.dumps({
+            "error": str(e),
+            "message": "Error al obtener desafíos del jugador",
+            "details": "Verifica que el jugador existe y la región es correcta"
+        }, indent=2)
+
+
 # ===== WRAPPED / ANALYTICS API =====
 
 @mcp.tool()
@@ -627,7 +735,7 @@ async def get_player_wrapped(
     tag_line: str,
     region: Optional[str] = None,
     match_count: int = 100,
-    year: Optional[int] = None
+    year: int = 2025
 ) -> str:
     """
     🎁 HERRAMIENTA PRINCIPAL PARA WRAPPED 🎁
@@ -643,7 +751,7 @@ async def get_player_wrapped(
         tag_line: Tag del invocador (ej: LAN, NA1, KR1)
         region: Región del servidor (ej: la1, na1, kr)
         match_count: Número de partidas a analizar (1-100, default: 100)
-        year: Año a analizar (None = año actual)
+        year: Año a analizar (default: 2025)
     
     Returns:
         JSON con Wrapped completo incluyendo:
@@ -653,14 +761,15 @@ async def get_player_wrapped(
         - Roles preferidos
         - Mejor y peor partida
         - Multikills (pentakills, quadrakills)
-        - Insights y frases motivacionales
+        - 🏆 Desafíos y logros (puntos, percentiles, badges)
+        - Insights y frases motivacionales (partidas + desafíos)
         - Stats detallados por campeón
     
     Example:
-        >>> get_player_wrapped("Faker", "KR1", "kr", 100, 2024)
+        >>> get_player_wrapped("Faker", "KR1", "kr", 100, 2025)
         {
             "player": {...},
-            "year": 2024,
+            "year": 2025,
             "statistics": {
                 "total_games": 150,
                 "wins": 95,
@@ -702,17 +811,32 @@ async def get_player_wrapped(
             try:
                 match_detail = await client.get_match_details(match_id, region)
                 matches.append(match_detail)
-            except Exception as e:
+            except Exception:
                 # Continuar si alguna partida falla
                 continue
         
         # 5. Analizar estadísticas
         statistics = analyze_match_history(matches, puuid)
         
-        # 6. Generar insights
+        # 6. Generar insights de partidas
         insights = generate_wrapped_insights(statistics)
         
-        # 7. Construir respuesta completa
+        # 7. Obtener y analizar desafíos
+        challenges_data = None
+        challenge_analysis = None
+        challenge_insights = []
+        try:
+            challenges_data = await client.get_player_challenges(puuid, region)
+            challenge_analysis = analyze_challenges(challenges_data)
+            challenge_insights = generate_challenge_insights(challenge_analysis)
+        except Exception:
+            # Si falla, continuar sin desafíos
+            pass
+        
+        # 8. Combinar insights
+        all_insights = insights + challenge_insights
+        
+        # 9. Construir respuesta completa
         wrapped = {
             "player": {
                 "game_name": account["gameName"],
@@ -722,11 +846,12 @@ async def get_player_wrapped(
                 "profile_icon_id": summoner.get("profileIconId", 0),
                 "mastery_score": mastery_score
             },
-            "year": year if year else "current",
+            "year": year,
             "ranked": ranked_info,
             "top_masteries": top_masteries,
             "statistics": statistics,
-            "insights": insights,
+            "challenges": challenge_analysis,
+            "insights": all_insights,
             "matches_analyzed": len(matches),
             "generated_at": json.dumps(datetime.now().isoformat())
         }
@@ -737,7 +862,7 @@ async def get_player_wrapped(
         return json.dumps({
             "error": str(e),
             "message": "Error al generar Wrapped del jugador",
-            "details": "Asegúrate de que el jugador existe y tiene partidas en el año especificado"
+            "details": f"Asegúrate de que el jugador existe y tiene partidas en {year}"
         }, indent=2)
 
 
@@ -858,7 +983,7 @@ def main():
     print(f"🚀 Iniciando servidor MCP con SSE...")
     print(f"   Transporte: Server-Sent Events (SSE)")
     print(f"   Puerto por defecto: 8000")
-    print(f"\n📚 Herramientas MCP disponibles (20 tools):")
+    print(f"\n📚 Herramientas MCP disponibles (21+ tools):")
     print(f"\n   🎯 Summoner & Account:")
     print(f"      - get_summoner_by_name")
     print(f"      - get_available_regions")
@@ -881,6 +1006,8 @@ def main():
     print(f"      - get_featured_games")
     print(f"\n   🔄 Champion Rotation:")
     print(f"      - get_free_champion_rotation")
+    print(f"\n   🏆 Challenges (NUEVO):")
+    print(f"      - get_player_challenges")
     print(f"\n   🎁 WRAPPED (Para tu web app):")
     print(f"      - get_player_wrapped ⭐ PRINCIPAL")
     print(f"      - get_player_profile_complete")

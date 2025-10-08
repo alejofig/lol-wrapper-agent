@@ -9,7 +9,8 @@ Servidor MCP (Model Context Protocol) para crear un **"Wrapped del Año"** estil
 ## 🌟 Características
 
 - 🎁 **Wrapped Completo**: Genera estadísticas anuales detalladas de cualquier jugador
-- 🔧 **20 Herramientas MCP**: Acceso completo a Champion Mastery, Ranked, Match History y más
+- 🏆 **Sistema de Desafíos**: Analiza logros, percentiles y badges especiales
+- 🔧 **21+ Herramientas MCP**: Acceso completo a Champion Mastery, Ranked, Match History, Challenges y más
 - 🌍 **Todas las Regiones**: Soporta las 16 regiones de League of Legends
 - ⚡ **FastMCP + SSE**: Servidor MCP optimizado para agentes de IA
 - 📊 **Análisis Inteligente**: Procesa hasta 100 partidas con estadísticas agregadas
@@ -53,7 +54,7 @@ agent = Agent(
 # Generar Wrapped
 async with agent.run_mcp_servers():
     result = await agent.run(
-        "Genera el Wrapped 2024 del jugador Faker#KR1 en la región kr"
+        "Genera el Wrapped 2025 del jugador Faker#KR1 en la región kr"
     )
     print(result.output)
 ```
@@ -80,7 +81,7 @@ get_player_wrapped(
     tag_line="KR1", 
     region="kr",
     match_count=100,  # Opcional, default: 100
-    year=2024         # Opcional, default: año actual
+    year=2025         # Opcional, default: 2025
 )
 ```
 
@@ -111,20 +112,38 @@ get_player_wrapped(
     "top_champions": [...],
     "best_game": {...}
   },
+  "challenges": {
+    "total_points": 15000,
+    "total_level": "MASTER",
+    "top_challenges": [...],
+    "percentile_achievements": [
+      {"tier": "top_1_percent", "challenge_id": 101101, ...}
+    ],
+    "category_breakdown": {...}
+  },
   "insights": [
     "Jugaste 368 partidas este año",
     "¡Dominaste con 66.5% de victorias!",
+    "🏆 Acumulaste 15,000 puntos de desafíos!",
+    "⭐ ¡INCREÍBLE! Estás en el TOP 1% en 3 desafío(s)",
     "..."
   ]
 }
 ```
 
-## 🛠️ Herramientas MCP Disponibles (20)
+## 🛠️ Herramientas MCP Disponibles (21+)
 
 ### 🎁 Wrapped / Analytics
-- `get_player_wrapped` ⭐ - Wrapped completo del año
+- `get_player_wrapped` ⭐ - Wrapped completo del año (con desafíos)
 - `get_player_profile_complete` - Perfil + ranked + maestrías
 - `get_detailed_match_analysis` - Análisis de partida específica
+
+### 🏆 Challenges (NUEVO)
+- `get_player_challenges` 🆕 - Desafíos y logros del jugador
+  - Puntos totales y nivel global
+  - Top desafíos por percentil
+  - Logros destacados (top 1%, 5%, 10%)
+  - Análisis por categoría (Veteranía, Colección, Experticia, etc.)
 
 ### 👤 Summoner & Account
 - `get_summoner_by_name` - Buscar jugador por nombre
@@ -214,7 +233,41 @@ async def get_wrapped(game_name: str, tag_line: str, region: str = "la1"):
             f"tag_line='{tag_line}', region='{region}', match_count=100"
         )
         return result.output
+
+@app.get("/api/challenges/{game_name}/{tag_line}")
+async def get_challenges(game_name: str, tag_line: str, region: str = "la1"):
+    """Endpoint para obtener solo desafíos."""
+    mcp_server = MCPServerSSE(url="http://localhost:8000/sse/")
+    agent = Agent("openai:gpt-4o", mcp_servers=[mcp_server])
+    
+    async with agent.run_mcp_servers():
+        result = await agent.run(
+            f"Usa get_player_challenges con game_name='{game_name}', "
+            f"tag_line='{tag_line}', region='{region}'"
+        )
+        return result.output
 ```
+
+## 🏆 Sistema de Desafíos
+
+Los desafíos son logros especiales de League of Legends que muestran la maestría del jugador en diferentes áreas:
+
+### Categorías de Desafíos:
+- **Veteranía** 🎖️: Tiempo jugado, experiencia
+- **Colección** 📦: Campeones desbloqueados, skins
+- **Experticia** 🎯: Habilidad mecánica, outplays
+- **Trabajo en Equipo** 🤝: Cooperación, asistencias
+- **Imaginación** ✨: Creatividad, estrategias únicas
+
+### Niveles:
+`IRON` → `BRONZE` → `SILVER` → `GOLD` → `PLATINUM` → `DIAMOND` → `MASTER` → `GRANDMASTER` → `CHALLENGER`
+
+### Percentiles:
+- **Top 1%** ⭐: Elite mundial
+- **Top 5%** 🌟: Jugador excepcional
+- **Top 10%** ✨: Por encima del promedio
+
+El Wrapped automáticamente incluye los desafíos más impresionantes del jugador en los insights.
 
 ## 🔧 Troubleshooting
 
@@ -231,8 +284,12 @@ async def get_wrapped(game_name: str, tag_line: str, region: str = "la1"):
 **Solución**: Verifica nombre, tag y región
 
 ### "Matches analyzed: 0"
-**Causa**: Jugador sin partidas recientes en el año especificado  
+**Causa**: Jugador sin partidas recientes en 2025  
 **Solución**: Normal. El Wrapped mostrará perfil y maestrías
+
+### Challenges no disponibles
+**Causa**: Algunos jugadores no tienen datos de challenges  
+**Solución**: Normal. El Wrapped continuará sin esta sección
 
 ### Región incorrecta
 **Causa**: El agente no está usando la región correcta  

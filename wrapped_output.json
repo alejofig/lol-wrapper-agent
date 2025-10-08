@@ -1,0 +1,280 @@
+{
+  "player": {
+    "game_name": "Kang Haerin",
+    "tag_line": "fox",
+    "puuid": "O9Ush5XQYEkk7oeonU8JS_gWLDoS_U2j8eEQ__4GPZNEy86Uz1WPiIPevG1ggGT3n7agsoHbq3SvPQ",
+    "summoner_level": 1002,
+    "profile_icon_id": 6913,
+    "mastery_score": 972
+  },
+  "year": 2025,
+  "ranked": [
+    {
+      "leagueId": "5a385482-530e-4bf2-bf27-de0d0ee6551d",
+      "queueType": "RANKED_SOLO_5x5",
+      "tier": "DIAMOND",
+      "rank": "IV",
+      "puuid": "O9Ush5XQYEkk7oeonU8JS_gWLDoS_U2j8eEQ__4GPZNEy86Uz1WPiIPevG1ggGT3n7agsoHbq3SvPQ",
+      "leaguePoints": 2,
+      "wins": 365,
+      "losses": 365,
+      "veteran": false,
+      "inactive": false,
+      "freshBlood": true,
+      "hotStreak": false
+    },
+    {
+      "leagueId": "d85e89e5-92ed-4597-aabc-38fa5c8968c9",
+      "queueType": "RANKED_FLEX_SR",
+      "tier": "PLATINUM",
+      "rank": "II",
+      "puuid": "O9Ush5XQYEkk7oeonU8JS_gWLDoS_U2j8eEQ__4GPZNEy86Uz1WPiIPevG1ggGT3n7agsoHbq3SvPQ",
+      "leaguePoints": 68,
+      "wins": 9,
+      "losses": 7,
+      "veteran": false,
+      "inactive": false,
+      "freshBlood": false,
+      "hotStreak": false
+    }
+  ],
+  "top_masteries": [
+    {
+      "puuid": "O9Ush5XQYEkk7oeonU8JS_gWLDoS_U2j8eEQ__4GPZNEy86Uz1WPiIPevG1ggGT3n7agsoHbq3SvPQ",
+      "championId": 84,
+      "championLevel": 61,
+      "championPoints": 639848,
+      "lastPlayTime": 1756692430000,
+      "championPointsSinceLastLevel": 3248,
+      "championPointsUntilNextLevel": 7752,
+      "markRequiredForNextLevel": 2,
+      "tokensEarned": 14,
+      "championSeasonMilestone": 1,
+      "milestoneGrades": [],
+      "nextSeasonMilestone": {
+        "requireGradeCounts": {
+          "A-": 1
+        },
+        "rewardMarks": 1,
+        "bonus": false,
+        "totalGamesRequires": 1
+      }
+    },
+    {
+      "puuid": "O9Ush5XQYEkk7oeonU8JS_gWLDoS_U2j8eEQ__4GPZNEy86Uz1WPiIPevG1ggGT3n7agsoHbq3SvPQ",
+      "championId": 103,
+      "championLevel": 43,
+      "championPoints": 441319,
+      "lastPlayTime": 1758161379000,
+      "championPointsSinceLastLevel": 2719,
+      "championPointsUntilNextLevel": 8281,
+      "markRequiredForNextLevel": 2,
+      "tokensEarned": 3,
+      "championSeasonMilestone": 1,
+      "milestoneGrades": [],
+      "nextSeasonMilestone": {
+        "requireGradeCounts": {
+          "A-": 1
+        },
+        "rewardMarks": 1,
+        "bonus": false,
+        "totalGamesRequires": 1
+      }
+    },
+    {
+      "puuid": "O9Ush5XQYEkk7oeonU8JS_gWLDoS_U2j8eEQ__4GPZNEy86Uz1WPiIPevG1ggGT3n7agsoHbq3SvPQ",
+      "championId": 39,
+      "championLevel": 32,
+      "championPoints": 324017,
+      "lastPlayTime": 1754815789000,
+      "championPointsSinceLastLevel": 6417,
+      "championPointsUntilNextLevel": 4583,
+      "markRequiredForNextLevel": 2,
+      "tokensEarned": 0,
+      "championSeasonMilestone": 0,
+      "nextSeasonMilestone": {
+        "requireGradeCounts": {
+          "A-": 1
+        },
+        "rewardMarks": 1,
+        "bonus": false,
+        "totalGamesRequires": 1
+      }
+    },
+    {
+      "puuid": "O9Ush5XQYEkk7oeonU8JS_gWLDoS_U2j8eEQ__4GPZNEy86Uz1WPiIPevG1ggGT3n7agsoHbq3SvPQ",
+      "championId": 517,
+      "championLevel": 25,
+      "championPoints": 247023,
+      "lastPlayTime": 1759105944000,
+      "championPointsSinceLastLevel": 6423,
+      "championPointsUntilNextLevel": 4577,
+      "markRequiredForNextLevel": 2,
+      "tokensEarned": 14,
+      "championSeasonMilestone": 3,
+      "milestoneGrades": [],
+      "nextSeasonMilestone": {
+        "requireGradeCounts": {
+          "S-": 1
+        },
+        "rewardMarks": 2,
+        "bonus": false,
+        "totalGamesRequires": 1
+      }
+    },
+    {
+      "puuid": "O9Ush5XQYEkk7oeonU8JS_gWLDoS_U2j8eEQ__4GPZNEy86Uz1WPiIPevG1ggGT3n7agsoHbq3SvPQ",
+      "championId": 7,
+      "championLevel": 24,
+      "championPoints": 229853,
+      "lastPlayTime": 1758158795000,
+      "championPointsSinceLastLevel": 253,
+      "championPointsUntilNextLevel": 10747,
+      "markRequiredForNextLevel": 2,
+      "tokensEarned": 14,
+      "championSeasonMilestone": 3,
+      "milestoneGrades": [],
+      "nextSeasonMilestone": {
+        "requireGradeCounts": {
+          "S-": 1
+        },
+        "rewardMarks": 2,
+        "bonus": false,
+        "totalGamesRequires": 1
+      }
+    }
+  ],
+  "statistics": {
+    "total_games": 0,
+    "wins": 0,
+    "losses": 0,
+    "winrate": 0.0,
+    "total_kills": 0,
+    "total_deaths": 0,
+    "total_assists": 0,
+    "avg_kda": 0.0,
+    "total_playtime_minutes": 0,
+    "best_game": null,
+    "worst_game": null,
+    "pentakills": 0,
+    "quadrakills": 0,
+    "triplekills": 0,
+    "first_bloods": 0,
+    "top_champions": [],
+    "top_roles": [],
+    "champion_details": []
+  },
+  "challenges": {
+    "total_points": 19010,
+    "total_level": "DIAMOND",
+    "top_challenges": [
+      {
+        "challenge_id": 303204,
+        "level": "NONE",
+        "percentile": 1.0,
+        "value": 1.0
+      },
+      {
+        "challenge_id": 602002,
+        "level": "NONE",
+        "percentile": 1.0,
+        "value": 1.0
+      },
+      {
+        "challenge_id": 401306,
+        "level": "NONE",
+        "percentile": 1.0,
+        "value": 1.0
+      },
+      {
+        "challenge_id": 103205,
+        "level": "GOLD",
+        "percentile": 0.431,
+        "value": 169.0
+      },
+      {
+        "challenge_id": 301204,
+        "level": "PLATINUM",
+        "percentile": 0.404,
+        "value": 29.0
+      }
+    ],
+    "category_breakdown": {
+      "VETERANCY": {
+        "current": 4140,
+        "level": "DIAMOND",
+        "max": 6300,
+        "percentile": 0.064
+      },
+      "EXPERTISE": {
+        "current": 4835,
+        "level": "DIAMOND",
+        "max": 6715,
+        "percentile": 0.057
+      },
+      "TEAMWORK": {
+        "current": 3815,
+        "level": "DIAMOND",
+        "max": 7735,
+        "percentile": 0.016
+      },
+      "IMAGINATION": {
+        "current": 3085,
+        "level": "DIAMOND",
+        "max": 4730,
+        "percentile": 0.041
+      },
+      "COLLECTION": {
+        "current": 3135,
+        "level": "DIAMOND",
+        "max": 4200,
+        "percentile": 0.051
+      }
+    },
+    "percentile_achievements": [
+      {
+        "challenge_id": 303204,
+        "level": "NONE",
+        "percentile": 1.0,
+        "value": 1.0,
+        "tier": "top_1_percent"
+      },
+      {
+        "challenge_id": 602002,
+        "level": "NONE",
+        "percentile": 1.0,
+        "value": 1.0,
+        "tier": "top_1_percent"
+      },
+      {
+        "challenge_id": 401306,
+        "level": "NONE",
+        "percentile": 1.0,
+        "value": 1.0,
+        "tier": "top_1_percent"
+      }
+    ],
+    "level_counts": {
+      "DIAMOND": 59,
+      "MASTER": 110,
+      "GRANDMASTER": 45,
+      "CHALLENGER": 31,
+      "PLATINUM": 35,
+      "IRON": 9,
+      "NONE": 3,
+      "GOLD": 33,
+      "BRONZE": 15,
+      "SILVER": 17
+    },
+    "total_active_challenges": 357
+  },
+  "insights": [
+    "\ud83c\udfc6 Acumulaste 19,010 puntos de desaf\u00edos!",
+    "\ud83c\udf96\ufe0f Tu nivel global de desaf\u00edos es: Diamante",
+    "\u2b50 \u00a1INCRE\u00cdBLE! Est\u00e1s en el TOP 1% en 3 desaf\u00edo(s)",
+    "\ud83d\udc51 Alcanzaste nivel Maestro o superior en 186 desaf\u00edo(s)",
+    "\ud83d\udd25 Tienes progreso en 357 desaf\u00edos diferentes"
+  ],
+  "matches_analyzed": 0,
+  "generated_at": "\"2025-10-07T23:08:03.084286\""
+}

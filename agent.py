@@ -44,7 +44,7 @@ async def test_pydantic_mcp():
         mcp_servers=[mcp_server]
     )
 
-    user_query = """Genera el Wrapped 2024 del jugador NamiNami#LAN.
+    user_query = """Genera el Wrapped 2025 del jugador Kang Haerin#fox.
     
     Instrucciones:
     1. Llama get_player_wrapped con estos parámetros EXACTOS:
@@ -52,6 +52,7 @@ async def test_pydantic_mcp():
        - tag_line: "fox"
        - region: "la1"
        - match_count: 20
+       - year: 2025
     
     2. Devuelve el JSON completo que obtengas
     3. NO interpretes los datos, solo devuélvelos

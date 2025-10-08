@@ -2,7 +2,7 @@
 
 from typing import Dict, List, Any, Optional
 from collections import Counter, defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 def calculate_kda(kills: int, deaths: int, assists: int) -> float:
@@ -251,13 +251,13 @@ def filter_matches_by_year(match_ids: List[str], year: Optional[int] = None) -> 
     
     Args:
         match_ids: Lista de IDs de partidas
-        year: Año a filtrar (None = año actual)
+        year: Año a filtrar (None = 2025)
     
     Returns:
         Lista de IDs filtrados
     """
     if year is None:
-        year = datetime.now().year
+        year = 2025  # Año por defecto para Wrapped
     
     # Los match IDs tienen formato: REGION_TIMESTAMP
     # El timestamp está en epoch time (seconds since 1970)
@@ -278,4 +278,192 @@ def filter_matches_by_year(match_ids: List[str], year: Optional[int] = None) -> 
             filtered.append(match_id)
     
     return filtered
+
+
+def analyze_challenges(challenges_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Analiza los datos de desafíos de un jugador y extrae insights.
+    
+    Args:
+        challenges_data: Datos de desafíos de la API
+    
+    Returns:
+        Análisis estructurado de desafíos
+    """
+    if not challenges_data or "challenges" not in challenges_data:
+        return {
+            "total_points": 0,
+            "top_challenges": [],
+            "category_breakdown": {},
+            "percentile_achievements": []
+        }
+    
+    challenges = challenges_data.get("challenges", [])
+    
+    # Filtrar solo challenges con progreso
+    active_challenges = [c for c in challenges if c.get("value", 0) > 0]
+    
+    # Ordenar por percentile (más alto = mejor)
+    top_challenges = sorted(
+        active_challenges,
+        key=lambda x: x.get("percentile", 0),
+        reverse=True
+    )[:10]
+    
+    # Encontrar challenges en percentiles altos (top 10%, 5%, 1%)
+    percentile_achievements = []
+    for challenge in active_challenges:
+        percentile = challenge.get("percentile", 0)
+        level = challenge.get("level", "NONE")
+        
+        if percentile >= 0.99:
+            percentile_achievements.append({
+                "challenge_id": challenge.get("challengeId"),
+                "level": level,
+                "percentile": percentile,
+                "value": challenge.get("value"),
+                "tier": "top_1_percent"
+            })
+        elif percentile >= 0.95:
+            percentile_achievements.append({
+                "challenge_id": challenge.get("challengeId"),
+                "level": level,
+                "percentile": percentile,
+                "value": challenge.get("value"),
+                "tier": "top_5_percent"
+            })
+        elif percentile >= 0.90:
+            percentile_achievements.append({
+                "challenge_id": challenge.get("challengeId"),
+                "level": level,
+                "percentile": percentile,
+                "value": challenge.get("value"),
+                "tier": "top_10_percent"
+            })
+    
+    # Análisis por categoría
+    category_points = challenges_data.get("categoryPoints", {})
+    category_breakdown = {}
+    for category, data in category_points.items():
+        category_breakdown[category] = {
+            "current": data.get("current", 0),
+            "level": data.get("level", "NONE"),
+            "max": data.get("max", 0),
+            "percentile": data.get("percentile", 0)
+        }
+    
+    # Contar challenges por nivel
+    level_counts = {}
+    for challenge in active_challenges:
+        level = challenge.get("level", "NONE")
+        level_counts[level] = level_counts.get(level, 0) + 1
+    
+    return {
+        "total_points": challenges_data.get("totalPoints", {}).get("current", 0),
+        "total_level": challenges_data.get("totalPoints", {}).get("level", "NONE"),
+        "top_challenges": [
+            {
+                "challenge_id": c.get("challengeId"),
+                "level": c.get("level"),
+                "percentile": c.get("percentile"),
+                "value": c.get("value")
+            }
+            for c in top_challenges[:5]
+        ],
+        "category_breakdown": category_breakdown,
+        "percentile_achievements": sorted(
+            percentile_achievements,
+            key=lambda x: x["percentile"],
+            reverse=True
+        ),
+        "level_counts": level_counts,
+        "total_active_challenges": len(active_challenges)
+    }
+
+
+def generate_challenge_insights(challenge_analysis: Dict[str, Any]) -> List[str]:
+    """
+    Genera insights motivacionales basados en los desafíos del jugador.
+    
+    Args:
+        challenge_analysis: Análisis de desafíos procesado
+    
+    Returns:
+        Lista de frases de insights
+    """
+    insights = []
+    
+    # Total points
+    total_points = challenge_analysis.get("total_points", 0)
+    if total_points > 0:
+        insights.append(f"🏆 Acumulaste {total_points:,} puntos de desafíos!")
+    
+    # Nivel total
+    total_level = challenge_analysis.get("total_level", "NONE")
+    if total_level != "NONE":
+        level_names = {
+            "IRON": "Hierro",
+            "BRONZE": "Bronce",
+            "SILVER": "Plata",
+            "GOLD": "Oro",
+            "PLATINUM": "Platino",
+            "DIAMOND": "Diamante",
+            "MASTER": "Maestro",
+            "GRANDMASTER": "Gran Maestro",
+            "CHALLENGER": "Retador"
+        }
+        insights.append(f"🎖️ Tu nivel global de desafíos es: {level_names.get(total_level, total_level)}")
+    
+    # Percentile achievements
+    percentile_achievements = challenge_analysis.get("percentile_achievements", [])
+    top_1_percent = [p for p in percentile_achievements if p["tier"] == "top_1_percent"]
+    top_5_percent = [p for p in percentile_achievements if p["tier"] == "top_5_percent"]
+    top_10_percent = [p for p in percentile_achievements if p["tier"] == "top_10_percent"]
+    
+    if top_1_percent:
+        insights.append(f"⭐ ¡INCREÍBLE! Estás en el TOP 1% en {len(top_1_percent)} desafío(s)")
+    if top_5_percent:
+        insights.append(f"🌟 Estás en el TOP 5% en {len(top_5_percent)} desafío(s)")
+    if top_10_percent:
+        insights.append(f"✨ Estás en el TOP 10% en {len(top_10_percent)} desafío(s)")
+    
+    # Nivel counts
+    level_counts = challenge_analysis.get("level_counts", {})
+    if "MASTER" in level_counts or "GRANDMASTER" in level_counts or "CHALLENGER" in level_counts:
+        high_tier = sum([
+            level_counts.get("MASTER", 0),
+            level_counts.get("GRANDMASTER", 0),
+            level_counts.get("CHALLENGER", 0)
+        ])
+        insights.append(f"👑 Alcanzaste nivel Maestro o superior en {high_tier} desafío(s)")
+    
+    # Categorías destacadas
+    category_breakdown = challenge_analysis.get("category_breakdown", {})
+    best_category = None
+    best_percentile = 0
+    
+    category_names = {
+        "VETERANCY": "Veteranía",
+        "COLLECTION": "Colección",
+        "EXPERTISE": "Experticia",
+        "TEAMWORK": "Trabajo en Equipo",
+        "IMAGINATION": "Imaginación"
+    }
+    
+    for category, data in category_breakdown.items():
+        percentile = data.get("percentile", 0)
+        if percentile > best_percentile:
+            best_percentile = percentile
+            best_category = category
+    
+    if best_category and best_percentile >= 0.75:
+        category_name = category_names.get(best_category, best_category)
+        insights.append(f"🎯 Tu categoría más fuerte es {category_name} (Top {int((1-best_percentile)*100)}%)")
+    
+    # Total active challenges
+    total_active = challenge_analysis.get("total_active_challenges", 0)
+    if total_active > 50:
+        insights.append(f"🔥 Tienes progreso en {total_active} desafíos diferentes")
+    
+    return insights
 

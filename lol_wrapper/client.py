@@ -493,4 +493,115 @@ class RiotAPIClient:
         base_url = self._get_platform_url(region)
         url = f"{base_url}/lol/platform/v3/champion-rotations"
         return await self._make_request(url)
+    
+    # ===== LOL CHALLENGES API v1 =====
+    
+    async def get_challenges_config(
+        self,
+        region: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Obtiene la lista de todos los desafíos básicos.
+        
+        Args:
+            region: Región del servidor
+            
+        Returns:
+            Lista de configuraciones de desafíos
+        """
+        region = region or self.default_region
+        base_url = self._get_platform_url(region)
+        url = f"{base_url}/lol/challenges/v1/challenges/config"
+        return await self._make_request(url)
+    
+    async def get_challenge_config(
+        self,
+        challenge_id: int,
+        region: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Obtiene la configuración de un desafío específico.
+        
+        Args:
+            challenge_id: ID del desafío
+            region: Región del servidor
+            
+        Returns:
+            Configuración del desafío
+        """
+        region = region or self.default_region
+        base_url = self._get_platform_url(region)
+        url = f"{base_url}/lol/challenges/v1/challenges/{challenge_id}/config"
+        return await self._make_request(url)
+    
+    async def get_challenge_leaderboard(
+        self,
+        challenge_id: int,
+        level: str = "CHALLENGER",
+        limit: int = 10,
+        region: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Obtiene la tabla de líderes de un desafío específico.
+        
+        Args:
+            challenge_id: ID del desafío
+            level: Nivel del leaderboard (MASTER, GRANDMASTER, CHALLENGER)
+            limit: Límite de resultados
+            region: Región del servidor
+            
+        Returns:
+            Lista de jugadores en el leaderboard
+        """
+        region = region or self.default_region
+        base_url = self._get_platform_url(region)
+        url = f"{base_url}/lol/challenges/v1/challenges/{challenge_id}/leaderboards/by-level/{level}"
+        if limit:
+            url += f"?limit={limit}"
+        return await self._make_request(url)
+    
+    async def get_challenge_percentiles(
+        self,
+        challenge_id: int,
+        region: Optional[str] = None
+    ) -> Dict[str, float]:
+        """
+        Obtiene los percentiles de un desafío específico.
+        
+        Args:
+            challenge_id: ID del desafío
+            region: Región del servidor
+            
+        Returns:
+            Percentiles del desafío
+        """
+        region = region or self.default_region
+        base_url = self._get_platform_url(region)
+        url = f"{base_url}/lol/challenges/v1/challenges/{challenge_id}/percentiles"
+        return await self._make_request(url)
+    
+    async def get_player_challenges(
+        self,
+        puuid: str,
+        region: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Obtiene todos los desafíos de un jugador por PUUID.
+        
+        Args:
+            puuid: PUUID del jugador
+            region: Región del servidor
+            
+        Returns:
+            Datos completos de desafíos del jugador incluyendo:
+            - Puntos totales
+            - Puntos por categoría
+            - Lista de todos los desafíos con progreso
+            - Percentiles
+            - Niveles alcanzados
+        """
+        region = region or self.default_region
+        base_url = self._get_platform_url(region)
+        url = f"{base_url}/lol/challenges/v1/player-data/{puuid}"
+        return await self._make_request(url)
 
