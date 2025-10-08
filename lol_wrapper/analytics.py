@@ -3,6 +3,7 @@
 from typing import Dict, List, Any, Optional
 from collections import Counter, defaultdict
 from datetime import datetime
+import calendar
 
 
 def calculate_kda(kills: int, deaths: int, assists: int) -> float:
@@ -43,7 +44,14 @@ def analyze_match_history(matches: List[Dict[str, Any]], puuid: str) -> Dict[str
         "first_bloods": 0,
         "champion_stats": defaultdict(lambda: {
             "games": 0, "wins": 0, "kills": 0, "deaths": 0, "assists": 0
-        })
+        }),
+        # Análisis temporal
+        "monthly_stats": defaultdict(lambda: {
+            "games": 0, "wins": 0, "kills": 0, "deaths": 0, "assists": 0,
+            "pentakills": 0, "quadrakills": 0, "triplekills": 0
+        }),
+        "hourly_stats": defaultdict(lambda: {"games": 0, "wins": 0}),
+        "weekday_stats": defaultdict(lambda: {"games": 0, "wins": 0})
     }
     
     best_kda = -1
@@ -55,6 +63,10 @@ def analyze_match_history(matches: List[Dict[str, Any]], puuid: str) -> Dict[str
             
         info = match["info"]
         stats["total_games"] += 1
+        
+        # Extraer timestamp de la partida
+        game_creation = info.get("gameCreation", 0) / 1000  # Convertir ms a segundos
+        game_datetime = datetime.fromtimestamp(game_creation) if game_creation > 0 else None
         
         # Encontrar al jugador en la partida
         player_data = None
@@ -98,10 +110,41 @@ def analyze_match_history(matches: List[Dict[str, Any]], puuid: str) -> Dict[str
             champ_stat["wins"] += 1
         
         # Multikills
-        stats["pentakills"] += player_data.get("pentaKills", 0)
-        stats["quadrakills"] += player_data.get("quadraKills", 0)
-        stats["triplekills"] += player_data.get("tripleKills", 0)
+        penta = player_data.get("pentaKills", 0)
+        quadra = player_data.get("quadraKills", 0)
+        triple = player_data.get("tripleKills", 0)
+        
+        stats["pentakills"] += penta
+        stats["quadrakills"] += quadra
+        stats["triplekills"] += triple
         stats["first_bloods"] += 1 if player_data.get("firstBloodKill", False) else 0
+        
+        # Análisis temporal (solo si tenemos fecha)
+        if game_datetime:
+            month_key = game_datetime.strftime("%Y-%m")  # "2025-01"
+            hour = game_datetime.hour
+            weekday = game_datetime.weekday()  # 0=Lunes, 6=Domingo
+            
+            monthly = stats["monthly_stats"][month_key]
+            monthly["games"] += 1
+            monthly["kills"] += kills
+            monthly["deaths"] += deaths
+            monthly["assists"] += assists
+            monthly["pentakills"] += penta
+            monthly["quadrakills"] += quadra
+            monthly["triplekills"] += triple
+            if won:
+                monthly["wins"] += 1
+            
+            hourly = stats["hourly_stats"][hour]
+            hourly["games"] += 1
+            if won:
+                hourly["wins"] += 1
+            
+            weekday_stat = stats["weekday_stats"][weekday]
+            weekday_stat["games"] += 1
+            if won:
+                weekday_stat["wins"] += 1
         
         # Mejor/peor partida
         kda = calculate_kda(kills, deaths, assists)
@@ -176,12 +219,195 @@ def analyze_match_history(matches: List[Dict[str, Any]], puuid: str) -> Dict[str
         reverse=True
     )[:10]
     
+    # Análisis temporal final
+    if stats["monthly_stats"]:
+        stats["temporal_insights"] = analyze_temporal_patterns(
+            dict(stats["monthly_stats"]),
+            dict(stats["hourly_stats"]),
+            dict(stats["weekday_stats"])
+        )
+    else:
+        stats["temporal_insights"] = {}
+    
     # Limpiar contadores (no son serializables a JSON directamente)
     del stats["champions_played"]
     del stats["roles_played"]
     del stats["champion_stats"]
+    del stats["monthly_stats"]
+    del stats["hourly_stats"]
+    del stats["weekday_stats"]
     
     return stats
+
+
+def analyze_temporal_patterns(
+    monthly_stats: Dict[str, Dict[str, int]],
+    hourly_stats: Dict[int, Dict[str, int]],
+    weekday_stats: Dict[int, Dict[str, int]]
+) -> Dict[str, Any]:
+    """
+    Analiza patrones temporales en las partidas.
+    
+    Args:
+        monthly_stats: Estadísticas por mes
+        hourly_stats: Estadísticas por hora del día
+        weekday_stats: Estadísticas por día de la semana (0=Lunes, 6=Domingo)
+    
+    Returns:
+        Dict con insights temporales
+    """
+    month_names = {
+        "01": "Enero", "02": "Febrero", "03": "Marzo", "04": "Abril",
+        "05": "Mayo", "06": "Junio", "07": "Julio", "08": "Agosto",
+        "09": "Septiembre", "10": "Octubre", "11": "Noviembre", "12": "Diciembre"
+    }
+    
+    # Encontrar mes más activo
+    most_active_month = None
+    most_games = 0
+    for month_key, data in monthly_stats.items():
+        if data["games"] > most_games:
+            most_games = data["games"]
+            most_active_month = month_key
+    
+    # Encontrar mes con más multikills
+    best_multikill_month = None
+    most_multikills = 0
+    for month_key, data in monthly_stats.items():
+        total_multi = data["pentakills"] + data["quadrakills"] + data["triplekills"]
+        if total_multi > most_multikills:
+            most_multikills = total_multi
+            best_multikill_month = month_key
+    
+    # Encontrar mes con mejor winrate
+    best_wr_month = None
+    best_winrate = 0
+    for month_key, data in monthly_stats.items():
+        if data["games"] >= 5:  # Mínimo 5 partidas para considerar
+            wr = (data["wins"] / data["games"]) * 100
+            if wr > best_winrate:
+                best_winrate = wr
+                best_wr_month = month_key
+    
+    # Encontrar mes con mejor KDA
+    best_kda_month = None
+    best_kda = 0
+    for month_key, data in monthly_stats.items():
+        if data["games"] >= 5:
+            kda = (data["kills"] + data["assists"]) / max(data["deaths"], 1)
+            if kda > best_kda:
+                best_kda = kda
+                best_kda_month = month_key
+    
+    # Análisis por hora del día
+    peak_hour = None
+    peak_games = 0
+    for hour, data in hourly_stats.items():
+        if data["games"] > peak_games:
+            peak_games = data["games"]
+            peak_hour = hour
+    
+    # Clasificar horarios
+    morning_games = sum(hourly_stats.get(h, {}).get("games", 0) for h in range(6, 12))
+    afternoon_games = sum(hourly_stats.get(h, {}).get("games", 0) for h in range(12, 18))
+    evening_games = sum(hourly_stats.get(h, {}).get("games", 0) for h in range(18, 24))
+    night_games = sum(hourly_stats.get(h, {}).get("games", 0) for h in range(0, 6))
+    
+    favorite_time = max([
+        ("mañana", morning_games),
+        ("tarde", afternoon_games),
+        ("noche", evening_games),
+        ("madrugada", night_games)
+    ], key=lambda x: x[1])
+    
+    # Análisis por día de la semana
+    weekday_names = {
+        0: "Lunes", 1: "Martes", 2: "Miércoles", 3: "Jueves",
+        4: "Viernes", 5: "Sábado", 6: "Domingo"
+    }
+    
+    favorite_weekday = None
+    max_weekday_games = 0
+    best_wr_weekday = None
+    best_weekday_wr = 0
+    
+    for day, data in weekday_stats.items():
+        games = data.get("games", 0)
+        wins = data.get("wins", 0)
+        
+        # Día favorito (más partidas)
+        if games > max_weekday_games:
+            max_weekday_games = games
+            favorite_weekday = day
+        
+        # Día con mejor winrate (mínimo 5 partidas)
+        if games >= 5:
+            wr = (wins / games) * 100
+            if wr > best_weekday_wr:
+                best_weekday_wr = wr
+                best_wr_weekday = day
+    
+    weekday_distribution = {
+        weekday_names[day]: data.get("games", 0)
+        for day, data in weekday_stats.items()
+    }
+    
+    # Formatear nombres de meses
+    most_active_month_name = None
+    if most_active_month:
+        month_part = most_active_month.split("-")[1]
+        most_active_month_name = month_names.get(month_part, most_active_month)
+    
+    best_multikill_month_name = None
+    if best_multikill_month:
+        month_part = best_multikill_month.split("-")[1]
+        best_multikill_month_name = month_names.get(month_part, best_multikill_month)
+    
+    best_wr_month_name = None
+    if best_wr_month:
+        month_part = best_wr_month.split("-")[1]
+        best_wr_month_name = month_names.get(month_part, best_wr_month)
+    
+    best_kda_month_name = None
+    if best_kda_month:
+        month_part = best_kda_month.split("-")[1]
+        best_kda_month_name = month_names.get(month_part, best_kda_month)
+    
+    return {
+        "most_active_month": {
+            "month": most_active_month_name,
+            "games": most_games
+        },
+        "best_multikill_month": {
+            "month": best_multikill_month_name,
+            "total_multikills": most_multikills,
+            "pentakills": monthly_stats.get(best_multikill_month, {}).get("pentakills", 0),
+            "quadrakills": monthly_stats.get(best_multikill_month, {}).get("quadrakills", 0)
+        } if best_multikill_month else None,
+        "best_winrate_month": {
+            "month": best_wr_month_name,
+            "winrate": round(best_winrate, 2)
+        } if best_wr_month else None,
+        "best_kda_month": {
+            "month": best_kda_month_name,
+            "kda": round(best_kda, 2)
+        } if best_kda_month else None,
+        "peak_hour": peak_hour,
+        "favorite_time_of_day": favorite_time[0],
+        "time_distribution": {
+            "morning": morning_games,
+            "afternoon": afternoon_games,
+            "evening": evening_games,
+            "night": night_games
+        },
+        "favorite_weekday": weekday_names.get(favorite_weekday) if favorite_weekday is not None else None,
+        "favorite_weekday_games": max_weekday_games,
+        "best_winrate_weekday": {
+            "day": weekday_names.get(best_wr_weekday),
+            "winrate": round(best_weekday_wr, 2)
+        } if best_wr_weekday is not None else None,
+        "weekday_distribution": weekday_distribution
+    }
 
 
 def generate_wrapped_insights(stats: Dict[str, Any]) -> List[str]:
@@ -241,6 +467,59 @@ def generate_wrapped_insights(stats: Dict[str, Any]) -> List[str]:
                 f"Tu mejor partida: {best['kills']}/{best['deaths']}/{best['assists']} "
                 f"con {best['champion']} (KDA: {best['kda']})"
             )
+        
+        # Insights temporales
+        temporal = stats.get("temporal_insights", {})
+        if temporal:
+            # Mes más activo
+            most_active = temporal.get("most_active_month")
+            if most_active and most_active.get("games", 0) > 0:
+                insights.append(
+                    f"Tu mes más activo fue {most_active['month']} con {most_active['games']} partidas"
+                )
+            
+            # Mes con más multikills
+            best_multi = temporal.get("best_multikill_month")
+            if best_multi and best_multi.get("total_multikills", 0) > 0:
+                insights.append(
+                    f"En {best_multi['month']} tuviste tu mejor racha de multikills "
+                    f"({best_multi['pentakills']} pentas, {best_multi['quadrakills']} quadras)"
+                )
+            
+            # Mejor mes de winrate
+            best_wr_month = temporal.get("best_winrate_month")
+            if best_wr_month and best_wr_month.get("winrate", 0) >= 55:
+                insights.append(
+                    f"{best_wr_month['month']} fue tu mejor mes con {best_wr_month['winrate']}% WR"
+                )
+            
+            # Horario favorito
+            fav_time = temporal.get("favorite_time_of_day")
+            if fav_time:
+                time_names = {
+                    "mañana": "la mañana",
+                    "tarde": "la tarde",
+                    "noche": "la noche",
+                    "madrugada": "la madrugada"
+                }
+                insights.append(
+                    f"Prefieres jugar en {time_names.get(fav_time, fav_time)}"
+                )
+            
+            # Día de la semana favorito
+            fav_weekday = temporal.get("favorite_weekday")
+            fav_weekday_games = temporal.get("favorite_weekday_games", 0)
+            if fav_weekday and fav_weekday_games > 0:
+                insights.append(
+                    f"Tu día favorito es {fav_weekday} ({fav_weekday_games} partidas)"
+                )
+            
+            # Mejor día de winrate
+            best_wr_day = temporal.get("best_winrate_weekday")
+            if best_wr_day and best_wr_day.get("winrate", 0) >= 55:
+                insights.append(
+                    f"Dominas los {best_wr_day['day']}s con {best_wr_day['winrate']}% WR"
+                )
     
     return insights
 
@@ -267,11 +546,13 @@ def filter_matches_by_year(match_ids: List[str], year: Optional[int] = None) -> 
     filtered = []
     for match_id in match_ids:
         try:
-            # Extraer timestamp del match ID
+            # Extraer timestamp del match ID (en segundos)
             parts = match_id.split('_')
             if len(parts) >= 2:
-                timestamp = int(parts[1])
-                if start_of_year <= timestamp < end_of_year:
+                timestamp_seconds = int(parts[1])
+                # Convertir a milisegundos para comparar
+                timestamp_ms = timestamp_seconds * 1000
+                if start_of_year <= timestamp_ms < end_of_year:
                     filtered.append(match_id)
         except (ValueError, IndexError):
             # Si no se puede parsear, incluir la partida

@@ -51,7 +51,7 @@ async def test_pydantic_mcp():
        - game_name: "Kang Haerin"
        - tag_line: "fox"
        - region: "la1"
-       - match_count: 20
+       - max_matches: 100  (con rate limiting, tardará ~60-90 segundos)
        - year: 2025
     
     2. Devuelve el JSON completo que obtengas

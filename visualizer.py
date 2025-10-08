@@ -105,6 +105,69 @@ def visualize_wrapped(wrapped_json: str) -> str:
         output.append(f"   - El historial de partidas está vacío")
         output.append(f"   - Las partidas no están disponibles en la API")
     
+    # Análisis Temporal
+    stats = data.get("statistics", {})
+    temporal = stats.get("temporal_insights", {})
+    if temporal and temporal.get("most_active_month"):
+        output.append(f"\n📅 ANÁLISIS TEMPORAL:")
+        
+        # Mes más activo
+        most_active = temporal.get("most_active_month")
+        if most_active and most_active.get("games", 0) > 0:
+            output.append(f"   Mes más activo: {most_active['month']} ({most_active['games']} partidas)")
+        
+        # Mes con más multikills
+        best_multi = temporal.get("best_multikill_month")
+        if best_multi and best_multi.get("total_multikills", 0) > 0:
+            output.append(f"   Mejor mes de multikills: {best_multi['month']} "
+                         f"({best_multi['pentakills']} pentas, {best_multi['quadrakills']} quadras)")
+        
+        # Mejor winrate
+        best_wr = temporal.get("best_winrate_month")
+        if best_wr:
+            output.append(f"   Mejor winrate: {best_wr['month']} ({best_wr['winrate']}%)")
+        
+        # Mejor KDA
+        best_kda = temporal.get("best_kda_month")
+        if best_kda:
+            output.append(f"   Mejor KDA: {best_kda['month']} ({best_kda['kda']})")
+        
+        # Horario favorito
+        fav_time = temporal.get("favorite_time_of_day")
+        time_dist = temporal.get("time_distribution", {})
+        if fav_time:
+            time_names = {
+                "mañana": "Mañana",
+                "tarde": "Tarde",
+                "noche": "Noche",
+                "madrugada": "Madrugada"
+            }
+            output.append(f"   Horario favorito: {time_names.get(fav_time, fav_time)}")
+            output.append(f"      Mañana (6-12h): {time_dist.get('morning', 0)} | "
+                         f"Tarde (12-18h): {time_dist.get('afternoon', 0)} | "
+                         f"Noche (18-24h): {time_dist.get('evening', 0)} | "
+                         f"Madrugada (0-6h): {time_dist.get('night', 0)}")
+        
+        # Día de la semana favorito
+        fav_weekday = temporal.get("favorite_weekday")
+        fav_weekday_games = temporal.get("favorite_weekday_games", 0)
+        if fav_weekday and fav_weekday_games > 0:
+            output.append(f"   Día favorito: {fav_weekday} ({fav_weekday_games} partidas)")
+        
+        best_wr_day = temporal.get("best_winrate_weekday")
+        if best_wr_day and best_wr_day.get("day"):
+            output.append(f"   Mejor día (WR): {best_wr_day['day']} ({best_wr_day['winrate']}%)")
+        
+        # Distribución por día
+        weekday_dist = temporal.get("weekday_distribution", {})
+        if weekday_dist:
+            output.append(f"   Distribución semanal:")
+            for day in ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]:
+                games = weekday_dist.get(day, 0)
+                if games > 0:
+                    bar = "█" * min(games // 2, 30)  # Visual bar
+                    output.append(f"      {day:10s}: {bar} ({games})")
+    
     # Desafíos
     challenges = data.get("challenges")
     if challenges and challenges.get("total_points", 0) > 0:

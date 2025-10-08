@@ -1,7 +1,9 @@
 """Cliente para interactuar con la API de Riot Games."""
 
 import httpx
+import asyncio
 from typing import Optional, List, Dict, Any
+from time import time
 
 
 class RiotAPIClient:
@@ -69,6 +71,12 @@ class RiotAPIClient:
             headers={"X-Riot-Token": api_key},
             timeout=30.0
         )
+        
+        # Rate limiting (Development Key limits)
+        self._request_times = []  # Track request timestamps
+        self._requests_per_second = 19  # Slightly under 20 to be safe
+        self._requests_per_2min = 95  # Slightly under 100 to be safe
+        self._rate_limit_lock = asyncio.Lock()
     
     async def close(self):
         """Cierra el cliente HTTP."""
@@ -94,22 +102,79 @@ class RiotAPIClient:
             )
         return f"https://{regional_platform}"
     
-    async def _make_request(self, url: str) -> Dict[str, Any]:
+    async def _wait_for_rate_limit(self):
         """
-        Realiza una petición a la API.
+        Espera si es necesario para respetar los rate limits.
+        Development Key:
+        - 20 requests/segundo
+        - 100 requests/2 minutos
+        """
+        async with self._rate_limit_lock:
+            now = time()
+            
+            # Limpiar requests antiguos (más de 2 minutos)
+            self._request_times = [t for t in self._request_times if now - t < 120]
+            
+            # Verificar límite de 2 minutos
+            if len(self._request_times) >= self._requests_per_2min:
+                # Esperar hasta que el request más antiguo tenga 2 minutos
+                oldest = self._request_times[0]
+                wait_time = 120 - (now - oldest)
+                if wait_time > 0:
+                    await asyncio.sleep(wait_time + 0.1)
+                    now = time()
+                    self._request_times = [t for t in self._request_times if now - t < 120]
+            
+            # Verificar límite de 1 segundo
+            recent = [t for t in self._request_times if now - t < 1.0]
+            if len(recent) >= self._requests_per_second:
+                # Esperar hasta el próximo segundo
+                await asyncio.sleep(1.0 - (now - recent[0]) + 0.05)
+            
+            # Registrar esta petición
+            self._request_times.append(time())
+    
+    async def _make_request(self, url: str, max_retries: int = 3) -> Dict[str, Any]:
+        """
+        Realiza una petición a la API con rate limiting y retry logic.
         
         Args:
             url: URL completa del endpoint
+            max_retries: Número máximo de reintentos en caso de 429
             
         Returns:
             Respuesta JSON de la API
             
         Raises:
-            httpx.HTTPStatusError: Si la petición falla
+            httpx.HTTPStatusError: Si la petición falla después de todos los reintentos
         """
-        response = await self.client.get(url)
-        response.raise_for_status()
-        return response.json()
+        for attempt in range(max_retries):
+            try:
+                # Esperar si es necesario para rate limiting
+                await self._wait_for_rate_limit()
+                
+                # Hacer la petición
+                response = await self.client.get(url)
+                response.raise_for_status()
+                return response.json()
+                
+            except httpx.HTTPStatusError as e:
+                if e.response.status_code == 429:
+                    # Rate limited - esperar y reintentar
+                    retry_after = int(e.response.headers.get('Retry-After', 2))
+                    wait_time = retry_after if attempt == 0 else retry_after * (2 ** attempt)
+                    
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(wait_time)
+                        continue
+                    else:
+                        raise
+                else:
+                    # Otro error HTTP - no reintentar
+                    raise
+        
+        # Esto no debería alcanzarse, pero por si acaso
+        raise Exception(f"Failed to make request after {max_retries} attempts")
     
     async def get_summoner_by_name(
         self,
@@ -372,7 +437,9 @@ class RiotAPIClient:
         puuid: str,
         count: int = 20,
         start: int = 0,
-        region: Optional[str] = None
+        region: Optional[str] = None,
+        start_time: Optional[int] = None,
+        end_time: Optional[int] = None
     ) -> List[str]:
         """
         Obtiene el historial de IDs de partidas de un jugador.
@@ -382,6 +449,8 @@ class RiotAPIClient:
             count: Número de partidas a retornar (max 100)
             start: Índice de inicio
             region: Región del servidor
+            start_time: Timestamp epoch en SEGUNDOS (filtra partidas después de este tiempo)
+            end_time: Timestamp epoch en SEGUNDOS (filtra partidas antes de este tiempo)
             
         Returns:
             Lista de IDs de partidas
@@ -390,6 +459,13 @@ class RiotAPIClient:
         cluster = self.PLATFORM_TO_CLUSTER.get(region.lower(), "americas")
         base_url = self._get_regional_url(cluster)
         url = f"{base_url}/lol/match/v5/matches/by-puuid/{puuid}/ids?start={start}&count={count}"
+        
+        # Añadir filtros de tiempo si se especifican
+        if start_time:
+            url += f"&startTime={start_time}"
+        if end_time:
+            url += f"&endTime={end_time}"
+        
         return await self._make_request(url)
     
     async def get_match_details(

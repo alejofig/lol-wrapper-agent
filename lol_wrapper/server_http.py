@@ -734,7 +734,7 @@ async def get_player_wrapped(
     game_name: str,
     tag_line: str,
     region: Optional[str] = None,
-    match_count: int = 100,
+    max_matches: int = 100,
     year: int = 2025
 ) -> str:
     """
@@ -743,15 +743,17 @@ async def get_player_wrapped(
     Genera un "Wrapped del Año" completo de un jugador con todas sus estadísticas,
     campeones favoritos, mejores partidas y más.
     
-    Esta herramienta obtiene y analiza hasta 100 partidas del jugador para generar
-    estadísticas agregadas perfectas para una web app de Wrapped.
+    Esta herramienta obtiene y analiza partidas del jugador con rate limiting automático
+    para respetar los límites de la API de Riot (20 req/s, 100 req/2min).
     
     Args:
         game_name: Nombre del invocador
         tag_line: Tag del invocador (ej: LAN, NA1, KR1)
         region: Región del servidor (ej: la1, na1, kr)
-        match_count: Número de partidas a analizar (1-100, default: 100)
-        year: Año a analizar (default: 2025)
+        max_matches: Máximo de partidas a analizar (default: 100)
+                     NOTA: Con Development Key, ~100 partidas toman ~60-90 segundos
+                     debido a rate limiting. Aumentar con precaución.
+        year: Año a analizar (default: 2025). Usa 0 para TODAS las partidas sin filtrar
     
     Returns:
         JSON con Wrapped completo incluyendo:
@@ -785,7 +787,7 @@ async def get_player_wrapped(
     try:
         # Normalizar región
         region = normalize_region(region)
-        match_count = min(max(match_count, 1), 100)  # Límite 1-100
+        max_matches = max(max_matches, 1)  # Mínimo 1
         
         # 1. Obtener perfil completo (TODAS las llamadas usan la misma región)
         account = await client.get_summoner_by_name(game_name, tag_line, region)
@@ -798,16 +800,45 @@ async def get_player_wrapped(
         mastery_score = await client.get_mastery_score(puuid, region)
         top_masteries = await client.get_top_champion_masteries(puuid, 5, region)
         
-        # 2. Obtener historial de partidas
-        match_ids = await client.get_match_history(puuid, match_count, 0, region)
+        # 2. Calcular filtros de tiempo si se especifica año
+        from datetime import datetime
+        start_time = None
+        end_time = None
+        if year and year > 0:
+            # Convertir a epoch seconds (Riot API usa segundos, no ms)
+            start_time = int(datetime(year, 1, 1).timestamp())
+            end_time = int(datetime(year + 1, 1, 1).timestamp())
         
-        # 3. Filtrar por año si se especificó
-        if year:
-            match_ids = filter_matches_by_year(match_ids, year)
+        # 3. Obtener TODAS las partidas del año con paginación
+        match_ids = []
+        batch_size = 100  # Máximo por request de Riot
+        offset = 0
+        
+        while len(match_ids) < max_matches:
+            # Obtener batch de IDs
+            batch = await client.get_match_history(
+                puuid, 
+                count=min(batch_size, max_matches - len(match_ids)),
+                start=offset,
+                region=region,
+                start_time=start_time,
+                end_time=end_time
+            )
+            
+            if not batch:
+                # No hay más partidas
+                break
+            
+            match_ids.extend(batch)
+            offset += len(batch)
+            
+            # Si el batch es menor que batch_size, no hay más partidas
+            if len(batch) < batch_size:
+                break
         
         # 4. Obtener detalles de todas las partidas (esto puede tomar tiempo)
         matches = []
-        for match_id in match_ids[:match_count]:  # Limitar para evitar timeouts
+        for match_id in match_ids[:max_matches]:
             try:
                 match_detail = await client.get_match_details(match_id, region)
                 matches.append(match_detail)

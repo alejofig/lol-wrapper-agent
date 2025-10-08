@@ -145,24 +145,232 @@
     }
   ],
   "statistics": {
-    "total_games": 0,
-    "wins": 0,
-    "losses": 0,
-    "winrate": 0.0,
-    "total_kills": 0,
-    "total_deaths": 0,
-    "total_assists": 0,
-    "avg_kda": 0.0,
-    "total_playtime_minutes": 0,
-    "best_game": null,
-    "worst_game": null,
+    "total_games": 100,
+    "wins": 57,
+    "losses": 43,
+    "winrate": 57.0,
+    "total_kills": 752,
+    "total_deaths": 623,
+    "total_assists": 1237,
+    "avg_kda": 3.19,
+    "total_playtime_minutes": 2636,
+    "best_game": {
+      "match_id": "LA1_1651259816",
+      "champion": "JarvanIV",
+      "kda": 35.0,
+      "kills": 16,
+      "deaths": 1,
+      "assists": 19,
+      "win": true,
+      "damage": 28018
+    },
+    "worst_game": {
+      "match_id": "LA1_1656172061",
+      "champion": "Nocturne",
+      "kda": 0.0,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "win": true
+    },
     "pentakills": 0,
-    "quadrakills": 0,
-    "triplekills": 0,
-    "first_bloods": 0,
-    "top_champions": [],
-    "top_roles": [],
-    "champion_details": []
+    "quadrakills": 1,
+    "triplekills": 14,
+    "first_bloods": 8,
+    "avg_kills": 7.52,
+    "avg_deaths": 6.23,
+    "avg_assists": 12.37,
+    "avg_game_duration": 26.36,
+    "top_champions": [
+      {
+        "champion": "MonkeyKing",
+        "games": 13
+      },
+      {
+        "champion": "Qiyana",
+        "games": 10
+      },
+      {
+        "champion": "JarvanIV",
+        "games": 7
+      },
+      {
+        "champion": "Zed",
+        "games": 6
+      },
+      {
+        "champion": "Pantheon",
+        "games": 5
+      },
+      {
+        "champion": "LeeSin",
+        "games": 4
+      },
+      {
+        "champion": "Volibear",
+        "games": 4
+      },
+      {
+        "champion": "Diana",
+        "games": 4
+      },
+      {
+        "champion": "Sylas",
+        "games": 4
+      },
+      {
+        "champion": "XinZhao",
+        "games": 4
+      }
+    ],
+    "top_roles": [
+      {
+        "role": "JUNGLE",
+        "games": 75
+      },
+      {
+        "role": "",
+        "games": 21
+      },
+      {
+        "role": "TOP",
+        "games": 3
+      },
+      {
+        "role": "UTILITY",
+        "games": 1
+      }
+    ],
+    "champion_details": [
+      {
+        "champion": "MonkeyKing",
+        "games": 13,
+        "wins": 8,
+        "winrate": 61.54,
+        "kda": 3.45,
+        "avg_kills": 4.92,
+        "avg_deaths": 3.23,
+        "avg_assists": 6.23
+      },
+      {
+        "champion": "Qiyana",
+        "games": 10,
+        "wins": 6,
+        "winrate": 60.0,
+        "kda": 3.65,
+        "avg_kills": 11.6,
+        "avg_deaths": 6.2,
+        "avg_assists": 11.0
+      },
+      {
+        "champion": "JarvanIV",
+        "games": 7,
+        "wins": 3,
+        "winrate": 42.86,
+        "kda": 4.79,
+        "avg_kills": 7.43,
+        "avg_deaths": 4.14,
+        "avg_assists": 12.43
+      },
+      {
+        "champion": "Zed",
+        "games": 6,
+        "wins": 5,
+        "winrate": 83.33,
+        "kda": 5.0,
+        "avg_kills": 8.33,
+        "avg_deaths": 3.17,
+        "avg_assists": 7.5
+      },
+      {
+        "champion": "Pantheon",
+        "games": 5,
+        "wins": 3,
+        "winrate": 60.0,
+        "kda": 2.81,
+        "avg_kills": 6.2,
+        "avg_deaths": 6.4,
+        "avg_assists": 11.8
+      },
+      {
+        "champion": "LeeSin",
+        "games": 4,
+        "wins": 2,
+        "winrate": 50.0,
+        "kda": 3.0,
+        "avg_kills": 4.75,
+        "avg_deaths": 7.0,
+        "avg_assists": 16.25
+      },
+      {
+        "champion": "Volibear",
+        "games": 4,
+        "wins": 3,
+        "winrate": 75.0,
+        "kda": 4.5,
+        "avg_kills": 4.75,
+        "avg_deaths": 2.5,
+        "avg_assists": 6.5
+      },
+      {
+        "champion": "Diana",
+        "games": 4,
+        "wins": 1,
+        "winrate": 25.0,
+        "kda": 3.52,
+        "avg_kills": 9.5,
+        "avg_deaths": 5.75,
+        "avg_assists": 10.75
+      },
+      {
+        "champion": "Sylas",
+        "games": 4,
+        "wins": 3,
+        "winrate": 75.0,
+        "kda": 2.24,
+        "avg_kills": 7.5,
+        "avg_deaths": 7.25,
+        "avg_assists": 8.75
+      },
+      {
+        "champion": "XinZhao",
+        "games": 4,
+        "wins": 3,
+        "winrate": 75.0,
+        "kda": 3.84,
+        "avg_kills": 9.0,
+        "avg_deaths": 4.75,
+        "avg_assists": 9.25
+      }
+    ],
+    "temporal_insights": {
+      "most_active_month": {
+        "month": "Septiembre",
+        "games": 94
+      },
+      "best_multikill_month": {
+        "month": "Septiembre",
+        "total_multikills": 11,
+        "pentakills": 0,
+        "quadrakills": 0
+      },
+      "best_winrate_month": {
+        "month": "Octubre",
+        "winrate": 66.67
+      },
+      "best_kda_month": {
+        "month": "Octubre",
+        "kda": 3.32
+      },
+      "peak_hour": 21,
+      "favorite_time_of_day": "noche",
+      "time_distribution": {
+        "morning": 10,
+        "afternoon": 30,
+        "evening": 50,
+        "night": 10
+      }
+    }
   },
   "challenges": {
     "total_points": 19010,
@@ -269,12 +477,22 @@
     "total_active_challenges": 357
   },
   "insights": [
+    "Jugaste 100 partidas este a\u00f1o",
+    "\u00a1Dominaste con 57.0% de victorias!",
+    "Tu campe\u00f3n principal fue MonkeyKing con 13 partidas",
+    "KDA impresionante de 3.19",
+    "Lograste 1 Quadrakill",
+    "Tu mejor partida: 16/1/19 con JarvanIV (KDA: 35.0)",
+    "Tu mes m\u00e1s activo fue Septiembre con 94 partidas",
+    "En Septiembre tuviste tu mejor racha de multikills (0 pentas, 0 quadras)",
+    "Octubre fue tu mejor mes con 66.67% WR",
+    "Prefieres jugar en la noche",
     "\ud83c\udfc6 Acumulaste 19,010 puntos de desaf\u00edos!",
     "\ud83c\udf96\ufe0f Tu nivel global de desaf\u00edos es: Diamante",
     "\u2b50 \u00a1INCRE\u00cdBLE! Est\u00e1s en el TOP 1% en 3 desaf\u00edo(s)",
     "\ud83d\udc51 Alcanzaste nivel Maestro o superior en 186 desaf\u00edo(s)",
     "\ud83d\udd25 Tienes progreso en 357 desaf\u00edos diferentes"
   ],
-  "matches_analyzed": 0,
-  "generated_at": "\"2025-10-07T23:08:03.084286\""
+  "matches_analyzed": 100,
+  "generated_at": "\"2025-10-07T23:48:44.788539\""
 }
