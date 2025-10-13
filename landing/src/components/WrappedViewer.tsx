@@ -10,7 +10,7 @@ import {
   subscribeToWrappedStatus,
   pollWrappedStatus,
   type PlayerWrapped
-} from '../lib/appsyncClient';
+} from '../lib/appsyncClient.ts';
 
 interface WrappedViewerProps {
   gameName?: string;
