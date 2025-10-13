@@ -13,5 +13,10 @@ export default defineConfig({
   output: 'static', // Static site para AWS Amplify Hosting
   server: {
     port: 4321
+  },
+  vite: {
+    resolve: {
+      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
+    }
   }
 });
