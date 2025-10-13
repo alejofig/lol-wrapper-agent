@@ -920,28 +920,64 @@ const currentYear = new Date().getFullYear();
 
     /* Responsive */
     @media (max-width: 768px) {
+      .container {
+        padding: 0 1.5rem;
+      }
+
       .nav-links a:not(.btn-primary) {
         display: none;
       }
 
+      .btn-primary {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+      }
+
+      .hero {
+        min-height: auto;
+        padding: 6rem 0 4rem;
+      }
+
       .hero-title {
-        font-size: 4rem;
+        font-size: clamp(2.5rem, 12vw, 4rem);
+        margin-bottom: 1rem;
       }
 
       .year-badge {
-        font-size: 2rem;
+        font-size: clamp(1.5rem, 8vw, 2.5rem);
       }
 
       .hero-subtitle {
-        font-size: 1.1rem;
+        font-size: 1rem;
+        padding: 0 1rem;
       }
 
-      .cta-title {
-        font-size: 2.5rem;
+      .hero-buttons {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 0 1rem;
+      }
+
+      .btn-hero, .btn-hero-secondary {
+        width: 100%;
+        max-width: 300px;
+        padding: 1rem 1.5rem;
+        font-size: 0.95rem;
+        text-align: center;
+      }
+
+      .hero-note {
+        font-size: 0.85rem;
+        padding: 0 1rem;
+      }
+
+      .about {
+        padding: 4rem 0;
       }
 
       .about-grid {
-        gap: 3rem;
+        gap: 2rem;
+        grid-template-columns: 1fr;
       }
 
       .about-card h3 {
@@ -949,12 +985,61 @@ const currentYear = new Date().getFullYear();
       }
 
       .about-card p {
-        font-size: 1rem;
+        font-size: 0.95rem;
       }
 
-      .btn-hero, .btn-hero-secondary {
-        padding: 1rem 2rem;
-        font-size: 1rem;
+      .cta {
+        padding: 4rem 0;
+      }
+
+      .cta-title {
+        font-size: 1.75rem;
+        padding: 0 1rem;
+      }
+
+      .cta-content {
+        padding: 0 1rem;
+      }
+
+      .input-group {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0.5rem;
+      }
+
+      .input-field {
+        width: 100%;
+        text-align: center;
+      }
+
+      .input-tag {
+        flex: 1;
+      }
+
+      .input-separator {
+        display: none;
+      }
+
+      .form-label {
+        font-size: 0.8rem;
+      }
+
+      .select-field {
+        font-size: 0.95rem;
+      }
+
+      .btn-submit {
+        font-size: 0.95rem;
+        padding: 0.875rem 1.5rem;
+      }
+
+      .footer {
+        padding: 3rem 0 2rem;
+      }
+
+      .footer-links {
+        gap: 1.5rem;
+        flex-direction: column;
       }
     }
   </style>
