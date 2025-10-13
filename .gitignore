@@ -47,3 +47,12 @@ htmlcov/
 
 .env
 .venv/
+landing/node_modules/
+landing/.env
+lol_wrapper/build.sh
+build.sh
+build*
+lol_wrapper/terraform.tfvars.example
+lol_wrapper/terraform*
+lol_wrapper/.terraform*
+lol_wrapper/*.tf

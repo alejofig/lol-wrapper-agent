@@ -1,0 +1,13 @@
+## Request Mapping Template
+## Obtiene un wrapped de DynamoDB por playerId y year
+
+{
+  "version": "2018-05-29",
+  "operation": "GetItem",
+  "key": {
+    "PK": $util.dynamodb.toDynamoDBJson("PLAYER#${ctx.args.playerId}"),
+    "SK": $util.dynamodb.toDynamoDBJson("WRAPPED#${ctx.args.year}")
+  },
+  "consistentRead": false
+}
+

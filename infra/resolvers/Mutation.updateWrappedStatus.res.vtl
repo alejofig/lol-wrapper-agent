@@ -1,0 +1,22 @@
+## Response Mapping Template
+## Retorna el wrapped actualizado
+
+{
+  "playerId": "$ctx.args.playerId",
+  "year": $ctx.args.year,
+  "status": "$ctx.args.status",
+  "gameName": "$ctx.result.gameName",
+  "tagLine": "$ctx.result.tagLine",
+  "region": "$ctx.result.region",
+  #if($ctx.args.wrappedData)
+    "wrappedData": $util.toJson($ctx.args.wrappedData),
+  #end
+  "requestedAt": "$ctx.result.requestedAt",
+  #if($ctx.args.completedAt)
+    "completedAt": "$ctx.args.completedAt",
+  #end
+  #if($ctx.args.error)
+    "error": "$ctx.args.error"
+  #end
+}
+

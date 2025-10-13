@@ -1,0 +1,21 @@
+## Response Mapping Template
+## Retorna el wrapped recién creado con estado PROCESSING
+
+#if($ctx.error)
+  ## Si hay error en la condición (ya existe PROCESSING), retornar el existente
+  $util.error($ctx.error.message, $ctx.error.type)
+#end
+
+#set($playerId = "${ctx.args.gameName}#${ctx.args.tagLine}")
+
+{
+  "playerId": "${playerId}",
+  "year": $ctx.args.year,
+  "status": "PROCESSING",
+  "gameName": "${ctx.args.gameName}",
+  "tagLine": "${ctx.args.tagLine}",
+  "region": "${ctx.args.region}",
+  "requestedAt": "$ctx.result.requestedAt"
+}
+
+

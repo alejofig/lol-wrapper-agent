@@ -1,0 +1,36 @@
+## Request Mapping Template
+## Crea un nuevo registro de wrapped con estado PROCESSING
+
+#set($playerId = "${ctx.args.gameName}#${ctx.args.tagLine}")
+#set($now = $util.time.nowISO8601())
+#set($ttl = $util.time.nowEpochSeconds() + 86400) ## TTL: 24 horas
+
+{
+  "version": "2018-05-29",
+  "operation": "PutItem",
+  "key": {
+    "PK": $util.dynamodb.toDynamoDBJson("PLAYER#${playerId}"),
+    "SK": $util.dynamodb.toDynamoDBJson("WRAPPED#${ctx.args.year}")
+  },
+  "attributeValues": {
+    "status": $util.dynamodb.toDynamoDBJson("PROCESSING"),
+    "gameName": $util.dynamodb.toDynamoDBJson("${ctx.args.gameName}"),
+    "tagLine": $util.dynamodb.toDynamoDBJson("${ctx.args.tagLine}"),
+    "region": $util.dynamodb.toDynamoDBJson("${ctx.args.region}"),
+    "requestedAt": $util.dynamodb.toDynamoDBJson("${now}"),
+    "ttl": $util.dynamodb.toDynamoDBJson(${ttl}),
+    "GSI1PK": $util.dynamodb.toDynamoDBJson("STATUS#PROCESSING"),
+    "GSI1SK": $util.dynamodb.toDynamoDBJson("${now}")
+  },
+  "condition": {
+    "expression": "attribute_not_exists(PK) OR #status <> :processing",
+    "expressionNames": {
+      "#status": "status"
+    },
+    "expressionValues": {
+      ":processing": $util.dynamodb.toDynamoDBJson("PROCESSING")
+    }
+  }
+}
+
+

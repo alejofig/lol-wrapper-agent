@@ -1,0 +1,37 @@
+## Response Mapping Template
+## Transforma la respuesta de DynamoDB a nuestro tipo GraphQL
+
+#if($ctx.result && $ctx.result.PK)
+  ## Item encontrado en DynamoDB
+  {
+    "playerId": "$ctx.args.playerId",
+    "year": $ctx.args.year,
+    "status": "$ctx.result.status",
+    "gameName": "$ctx.result.gameName",
+    "tagLine": "$ctx.result.tagLine",
+    "region": "$ctx.result.region",
+    #if($ctx.result.wrappedData)
+      "wrappedData": $util.toJson($ctx.result.wrappedData),
+    #end
+    "requestedAt": "$ctx.result.requestedAt",
+    #if($ctx.result.completedAt)
+      "completedAt": "$ctx.result.completedAt",
+    #end
+    #if($ctx.result.error)
+      "error": "$ctx.result.error"
+    #end
+  }
+#else
+  ## Item no encontrado - retornar estado NOT_FOUND
+  {
+    "playerId": "$ctx.args.playerId",
+    "year": $ctx.args.year,
+    "status": "NOT_FOUND",
+    "gameName": "",
+    "tagLine": "",
+    "region": "",
+    "requestedAt": "$util.time.nowISO8601()"
+  }
+#end
+
+

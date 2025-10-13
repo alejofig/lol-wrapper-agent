@@ -29,6 +29,7 @@ try:
         analyze_challenges,
         generate_challenge_insights
     )
+    from .data_dragon import DataDragonClient
 except ImportError:
     from lol_wrapper.client import RiotAPIClient
     from lol_wrapper.analytics import (
@@ -38,6 +39,7 @@ except ImportError:
         analyze_challenges,
         generate_challenge_insights
     )
+    from lol_wrapper.data_dragon import DataDragonClient
 
 # Cargar variables de entorno
 load_dotenv()
@@ -46,7 +48,7 @@ load_dotenv()
 RIOT_API_KEY = os.getenv("RIOT_API_KEY")
 DEFAULT_REGION = os.getenv("DEFAULT_REGION", "na1")
 HTTP_HOST = os.getenv("HTTP_HOST", "0.0.0.0")
-HTTP_PORT = int(os.getenv("HTTP_PORT", "8000"))
+HTTP_PORT = int(os.getenv("PORT", "8080"))
 
 if not RIOT_API_KEY:
     raise ValueError(
@@ -55,10 +57,13 @@ if not RIOT_API_KEY:
     )
 
 # Inicializar FastMCP
-mcp = FastMCP("League of Legends Champion Mastery API")
+mcp = FastMCP("League of Legends Champion Mastery API", host=HTTP_HOST, port=HTTP_PORT)
 
 # Cliente global de la API
 client = RiotAPIClient(RIOT_API_KEY, DEFAULT_REGION)
+
+# Cliente de Data Dragon (CDN de assets - no consume rate limits)
+ddragon = DataDragonClient()
 
 
 def normalize_region(region: Optional[str]) -> str:
@@ -998,22 +1003,200 @@ async def get_detailed_match_analysis(
         }, indent=2)
 
 
+# ===== DATA DRAGON / IMAGES API =====
+
+@mcp.tool()
+async def get_champion_splash_urls(champion_ids: str) -> str:
+    """
+    🖼️ OPTIMIZADO: Obtiene las URLs de splash art para múltiples campeones en una sola llamada.
+    
+    Esta herramienta es MUY EFICIENTE porque:
+    - NO consume rate limits de Riot API (usa CDN público)
+    - Procesa múltiples campeones simultáneamente
+    - Retorna URLs directas listas para usar
+    
+    Args:
+        champion_ids: IDs de campeones separados por comas (ej: "103,222,157")
+    
+    Returns:
+        JSON con array de objetos {championId, name, splash}
+    
+    Example:
+        >>> get_champion_splash_urls("103,222,157")
+        [
+            {
+                "championId": 103,
+                "name": "Ahri",
+                "splash": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg"
+            },
+            {
+                "championId": 222,
+                "name": "Jinx",
+                "splash": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg"
+            }
+        ]
+    """
+    try:
+        # Parsear IDs
+        ids_list = [int(id.strip()) for id in champion_ids.split(',') if id.strip()]
+        
+        # Obtener splash URLs
+        splash_urls = await ddragon.get_champion_splash_urls(ids_list)
+        
+        return json.dumps(splash_urls, indent=2, ensure_ascii=False)
+    except Exception as e:
+        return json.dumps({
+            "error": str(e),
+            "message": "Error al obtener splash URLs de campeones"
+        }, indent=2)
+
+
+@mcp.tool()
+async def get_champion_images(champion_id: int) -> str:
+    """
+    Obtiene todas las imágenes disponibles de un campeón específico.
+    
+    Args:
+        champion_id: ID del campeón
+    
+    Returns:
+        JSON con URLs de splash, square, loading, y passive
+    """
+    try:
+        images = await ddragon.get_champion_images(champion_id)
+        return json.dumps(images, indent=2, ensure_ascii=False)
+    except Exception as e:
+        return json.dumps({
+            "error": str(e),
+            "message": f"Error al obtener imágenes del campeón {champion_id}"
+        }, indent=2)
+
+
+@mcp.tool()
+async def get_multiple_champion_images(champion_ids: str) -> str:
+    """
+    Obtiene imágenes de múltiples campeones.
+    Similar a get_champion_splash_urls pero retorna MÁS información (square, loading, etc).
+    
+    Args:
+        champion_ids: IDs separados por comas
+    
+    Returns:
+        JSON con array de objetos con todas las imágenes por campeón
+    """
+    try:
+        ids_list = [int(id.strip()) for id in champion_ids.split(',') if id.strip()]
+        
+        results = []
+        for champ_id in ids_list:
+            try:
+                images = await ddragon.get_champion_images(champ_id)
+                results.append(images)
+            except Exception:
+                continue
+        
+        return json.dumps(results, indent=2, ensure_ascii=False)
+    except Exception as e:
+        return json.dumps({
+            "error": str(e),
+            "message": "Error al obtener imágenes de campeones"
+        }, indent=2)
+
+
+@mcp.tool()
+async def get_champion_data_with_images(champion_ids: str) -> str:
+    """
+    Obtiene datos completos de campeones incluyendo imágenes.
+    Combina información de nombre, título, tags, stats E imágenes.
+    
+    Args:
+        champion_ids: IDs separados por comas
+    
+    Returns:
+        JSON con datos completos + imágenes
+    """
+    try:
+        ids_list = [int(id.strip()) for id in champion_ids.split(',') if id.strip()]
+        
+        # Obtener datos de campeones
+        champion_data = await ddragon.get_champion_data()
+        
+        results = []
+        for champ_id in ids_list:
+            # Buscar campeón por ID
+            for champ_key, champ_info in champion_data.items():
+                if int(champ_info['key']) == champ_id:
+                    # Agregar imágenes
+                    try:
+                        images = await ddragon.get_champion_images(champ_id)
+                        champ_info['images'] = images
+                    except Exception:
+                        pass
+                    
+                    results.append(champ_info)
+                    break
+        
+        return json.dumps(results, indent=2, ensure_ascii=False)
+    except Exception as e:
+        return json.dumps({
+            "error": str(e),
+            "message": "Error al obtener datos de campeones con imágenes"
+        }, indent=2)
+
+
+@mcp.tool()
+async def get_profile_icon_url(icon_id: int) -> str:
+    """
+    Obtiene la URL del icono de perfil de un jugador.
+    
+    Args:
+        icon_id: ID del icono de perfil
+    
+    Returns:
+        JSON con la URL del icono
+    """
+    try:
+        url = await ddragon.get_profile_icon_url(icon_id)
+        return json.dumps({
+            "icon_id": icon_id,
+            "url": url
+        }, indent=2, ensure_ascii=False)
+    except Exception as e:
+        return json.dumps({
+            "error": str(e),
+            "message": f"Error al obtener URL del icono {icon_id}"
+        }, indent=2)
+
+
+@mcp.tool()
+async def get_latest_version() -> str:
+    """
+    Obtiene la última versión de Data Dragon (útil para construir URLs manualmente).
+    
+    Returns:
+        JSON con la versión actual
+    """
+    try:
+        version = await ddragon.get_latest_version()
+        return json.dumps({
+            "version": version,
+            "base_url": f"https://ddragon.leagueoflegends.com/cdn/{version}"
+        }, indent=2, ensure_ascii=False)
+    except Exception as e:
+        return json.dumps({
+            "error": str(e),
+            "message": "Error al obtener versión de Data Dragon"
+        }, indent=2)
+
+
 def main():
     """Punto de entrada principal para el servidor MCP SSE."""
-    import asyncio
-    
-    async def cleanup():
-        """Limpieza al cerrar el servidor."""
-        await client.close()
-    
-    # Registrar limpieza
-    import atexit
-    atexit.register(lambda: asyncio.run(cleanup()))
+    # No necesitamos async cleanup para el servidor SSE síncrono
     
     # Iniciar servidor MCP con transporte SSE
     print(f"🚀 Iniciando servidor MCP con SSE...")
     print(f"   Transporte: Server-Sent Events (SSE)")
-    print(f"   Puerto por defecto: 8000")
+    print(f"   Puerto: {HTTP_PORT}")
     print(f"\n📚 Herramientas MCP disponibles (21+ tools):")
     print(f"\n   🎯 Summoner & Account:")
     print(f"      - get_summoner_by_name")
@@ -1039,6 +1222,13 @@ def main():
     print(f"      - get_free_champion_rotation")
     print(f"\n   🏆 Challenges (NUEVO):")
     print(f"      - get_player_challenges")
+    print(f"\n   🖼️  Imágenes (Data Dragon - SIN rate limits):")
+    print(f"      - get_champion_splash_urls ⚡ OPTIMIZADO")
+    print(f"      - get_champion_images")
+    print(f"      - get_multiple_champion_images")
+    print(f"      - get_champion_data_with_images")
+    print(f"      - get_profile_icon_url")
+    print(f"      - get_latest_version")
     print(f"\n   🎁 WRAPPED (Para tu web app):")
     print(f"      - get_player_wrapped ⭐ PRINCIPAL")
     print(f"      - get_player_profile_complete")
@@ -1046,8 +1236,9 @@ def main():
     print(f"\n✅ Servidor MCP SSE listo. Presiona Ctrl+C para detener.")
     print(f"\n💡 Para usar con un agente MCP, configura:")
     print(f'   "transport": "sse"')
-    print(f'   "url": "http://localhost:8000/sse"')
-    print(f"\n🎯 Para el Wrapped usa: get_player_wrapped(game_name, tag_line, region)\n")
+    print(f'   "url": "http://localhost:{HTTP_PORT}/sse"')
+    print(f"\n🎯 Para el Wrapped usa: get_player_wrapped(game_name, tag_line, region)")
+    print(f"🖼️ Para imágenes usa: get_champion_splash_urls(champion_ids) ⚡ OPTIMIZADO\n")
     
     # Iniciar servidor MCP en modo SSE
     # FastMCP manejará el servidor HTTP internamente
@@ -1056,4 +1247,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

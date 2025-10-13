@@ -1,0 +1,44 @@
+## Request Mapping Template
+## Actualiza el estado de un wrapped (usado por Lambda en Fase 2)
+
+#set($now = $util.time.nowISO8601())
+
+{
+  "version": "2018-05-29",
+  "operation": "UpdateItem",
+  "key": {
+    "PK": $util.dynamodb.toDynamoDBJson("PLAYER#${ctx.args.playerId}"),
+    "SK": $util.dynamodb.toDynamoDBJson("WRAPPED#${ctx.args.year}")
+  },
+  "update": {
+    "expression": "SET #status = :status, #updatedAt = :now",
+    "expressionNames": {
+      "#status": "status",
+      "#updatedAt": "updatedAt"
+    },
+    "expressionValues": {
+      ":status": $util.dynamodb.toDynamoDBJson("${ctx.args.status}"),
+      ":now": $util.dynamodb.toDynamoDBJson("${now}")
+    }
+  }
+}
+
+## Añadir campos opcionales si existen
+#if($ctx.args.wrappedData)
+  $util.qr($ctx.stash.put("hasWrappedData", true))
+  #set($expression = "$expression, wrappedData = :wrappedData")
+  $util.qr($ctx.stash.expressionValues.put(":wrappedData", $util.dynamodb.toDynamoDBJson($ctx.args.wrappedData)))
+#end
+
+#if($ctx.args.completedAt)
+  #set($expression = "$expression, completedAt = :completedAt")
+  $util.qr($ctx.stash.expressionValues.put(":completedAt", $util.dynamodb.toDynamoDBJson($ctx.args.completedAt)))
+#end
+
+#if($ctx.args.error)
+  #set($expression = "$expression, #error = :error")
+  $util.qr($ctx.stash.expressionNames.put("#error", "error"))
+  $util.qr($ctx.stash.expressionValues.put(":error", $util.dynamodb.toDynamoDBJson($ctx.args.error)))
+#end
+
+

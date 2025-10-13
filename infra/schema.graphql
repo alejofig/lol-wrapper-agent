@@ -1,0 +1,65 @@
+# Schema GraphQL para AppSync - Fase 1
+# League of Legends Wrapped 2025
+
+# Tipo principal: Wrapped de un jugador
+type PlayerWrapped {
+  playerId: ID!
+  year: Int!
+  status: WrappedStatus!
+  gameName: String!
+  tagLine: String!
+  region: String!
+  wrappedData: AWSJSON
+  requestedAt: AWSDateTime!
+  completedAt: AWSDateTime
+  error: String
+}
+
+# Estados posibles del wrapped
+enum WrappedStatus {
+  NOT_FOUND
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+# Queries - Consultar datos
+type Query {
+  # Obtener wrapped de un jugador
+  getWrapped(playerId: ID!, year: Int!): PlayerWrapped
+}
+
+# Mutations - Modificar datos
+type Mutation {
+  # Solicitar generación de wrapped
+  requestWrapped(
+    gameName: String!
+    tagLine: String!
+    region: String!
+    year: Int!
+  ): PlayerWrapped!
+  
+  # Actualizar estado del wrapped (será usado por Lambda en Fase 2)
+  updateWrappedStatus(
+    playerId: ID!
+    year: Int!
+    status: WrappedStatus!
+    wrappedData: AWSJSON
+    completedAt: AWSDateTime
+    error: String
+  ): PlayerWrapped!
+}
+
+# Subscriptions - Notificaciones en tiempo real
+type Subscription {
+  # Subscribirse a cambios de estado de un wrapped
+  onWrappedStatusChanged(playerId: ID!): PlayerWrapped
+    @aws_subscribe(mutations: ["updateWrappedStatus"])
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+

@@ -305,7 +305,14 @@ lol-wrapper/
 │   ├── client.py            # Cliente de Riot API
 │   ├── analytics.py         # Análisis y agregación
 │   └── champions.py         # IDs y nombres de campeones
+├── landing/                 # 🆕 Landing page con Astro
+│   ├── src/
+│   │   └── pages/
+│   │       └── index.astro  # Página principal
+│   ├── public/              # Assets estáticos
+│   └── README.md
 ├── agent.py                 # Ejemplo de uso con agente
+├── agent_strands.py         # Ejemplo con Strands Agents
 ├── visualizer.py            # Visualizador de Wrapped
 ├── tests/                   # Tests unitarios
 ├── .env                     # Configuración (no incluido)
@@ -322,9 +329,39 @@ uv run pytest tests/ -v
 # Probar servidor manualmente
 uv run python lol_wrapper/server_http.py
 
-# Probar con agente
+# Probar con agente (Pydantic AI)
 uv run python agent.py
+
+# Probar con agente (Strands)
+uv run python agent_strands.py
 ```
+
+## 🌐 Landing Page
+
+Este proyecto incluye una landing page moderna construida con Astro:
+
+```bash
+# Navegar a la carpeta de landing
+cd landing
+
+# Instalar dependencias
+npm install
+
+# Iniciar servidor de desarrollo
+npm run dev
+
+# Acceder en http://localhost:4321
+```
+
+**Características de la landing:**
+- ✨ Diseño moderno y responsivo
+- 🎯 Optimizado para SEO
+- ⚡ Ultra rápido (Astro + CSS vanilla)
+- 🌈 Gradientes y animaciones suaves
+- 📱 Mobile-first design
+- 🎮 Temática de League of Legends
+
+Para más información, ver [landing/README.md](landing/README.md)
 
 ## 📚 Recursos
 
@@ -345,13 +382,16 @@ Las contribuciones son bienvenidas! Por favor:
 
 ## 📝 TODO
 
+- [x] Landing page moderna con Astro ✨
+- [ ] Integrar landing con backend MCP
+- [ ] Página de resultados del Wrapped con visualizaciones
+- [ ] Chat interactivo con el agente IA
 - [ ] Cache de respuestas para optimizar rate limits
 - [ ] Soporte para más APIs (TFT, Valorant)
 - [ ] Docker support
 - [ ] CI/CD con GitHub Actions
 - [ ] Data Dragon integration para nombres de campeones
 - [ ] Webhooks para actualizaciones en tiempo real
-- [ ] Dashboard web para visualizar Wrapped
 
 ## 📄 Licencia
 

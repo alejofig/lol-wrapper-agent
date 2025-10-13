@@ -1,21 +1,35 @@
 import asyncio
 import logging
 from pydantic_ai import Agent
-from pydantic_ai.mcp import MCPServerSSE #
+from pydantic_ai.mcp import MCPServerSSE
 from dotenv import load_dotenv
-
+from pydantic_ai.models.bedrock import BedrockConverseModel
+from pydantic_ai.models.anthropic import AnthropicModelSettings
+import os
+model_settings = {
+    "max_tokens": 64000,
+    "temperature": 0.7,
+    "frequency_penalty": 0,
+    "presence_penalty": 0
+}
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("MCP_TEST")
+logger = logging.getLogger("MCP_TEST_BEDROCK")
 
 
-async def test_pydantic_mcp():
-    """Test Pydantic AI MCP integration with sanitized server."""
-    logger.info("Testing Pydantic AI MCP integration")
-    mcp_server = MCPServerSSE(url="http://localhost:8000/sse/") # Change to your MCP endpoint
+model = BedrockConverseModel(
+    model_name="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    settings=AnthropicModelSettings(**model_settings)
+)
+mcp_url = os.getenv("MCP_SERVER_URL","http://localhost:8080/sse/")
+async def test_pydantic_mcp_bedrock():
+    """Test Pydantic AI MCP integration with AWS Bedrock."""
+    logger.info("Testing Pydantic AI MCP integration with AWS Bedrock")
+    mcp_server = MCPServerSSE(mcp_url)
     
+    # Usando Bedrock con Claude 4.5 Sonnet (lanzado septiembre 2025)
     agent = Agent(
-        "openai:gpt-4o",
+        model=model,
         system_prompt="""Eres un experto en análisis de datos de League of Legends.
         
         REGLAS CRÍTICAS:
@@ -61,8 +75,8 @@ async def test_pydantic_mcp():
     
     PASO 1 - Obtener Wrapped:
     Llama get_player_wrapped con estos parámetros:
-       - game_name: "NamiNami"
-       - tag_line: "LAN"
+       - game_name: "Kang Haerin"
+       - tag_line: "fox"
        - region: "la1"
        - max_matches: 100  (tardará ~60-90 segundos con rate limiting)
        - year: 2025
@@ -83,7 +97,7 @@ async def test_pydantic_mcp():
     """
     
     async with agent.run_mcp_servers():
-        logger.info(f"Executing query: {user_query}")
+        logger.info(f"Executing query with Bedrock: {user_query}")
         result = await agent.run(user_query)
         
         # Parsear y visualizar el resultado
@@ -94,19 +108,18 @@ async def test_pydantic_mcp():
             output = output.replace("```json\n", "").replace("\n```", "").strip()
         elif output.startswith("```"):
             output = output.replace("```\n", "").replace("\n```", "").strip()
-        
-        # Visualizar
+        print(output)
         from visualizer import visualize_wrapped
+        import json
         print("\n" + visualize_wrapped(output))
         
         # También guardar el JSON raw
-        import json
-        with open("wrapped_output.json", "w") as f:
+        with open("wrapped_output_strands.json", "w") as f:
             json.dump(json.loads(output), f, indent=2)
-        logger.info("Wrapped guardado en wrapped_output.json")
-
+        logger.info("Wrapped guardado en wrapped_output_strands.json")
 async def main():
-    await test_pydantic_mcp()
+    await test_pydantic_mcp_bedrock()
 
 if __name__ == "__main__":
     asyncio.run(main())
+
