@@ -1,0 +1,832 @@
+---
+// Blog - How We Built LoL Wrapped
+const currentYear = new Date().getFullYear();
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How We Built LoL Wrapped | Technical Blog</title>
+  <meta name="description" content="Learn about the architecture and technology behind LoL Wrapped - AWS, AI, and the Riot Games API.">
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="How We Built LoL Wrapped">
+  <meta property="og:description" content="Deep dive into the serverless architecture powering LoL Wrapped">
+  <meta property="og:image" content="/diagram.png">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#0A0E14">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container">
+      <div class="nav-content">
+        <a href="/" class="logo">
+          <img src="/logo.svg" alt="LoL Wrapped" class="logo-icon">
+          <span class="logo-text">LoL Wrapped</span>
+        </a>
+        <div class="nav-links">
+          <a href="/">Home</a>
+          <a href="#architecture">Architecture</a>
+          <a href="https://github.com/alejofig/lol-wrapper-agent" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="blog-hero">
+    <div class="container">
+      <h1 class="blog-title">How We Built LoL Wrapped</h1>
+      <p class="blog-subtitle">A deep dive into the serverless architecture powering your year in League of Legends</p>
+      <div class="blog-meta">
+        <span>By Alejandro Figueroa</span>
+        <span>•</span>
+        <span>October 2025</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Content -->
+  <article class="blog-content">
+    <div class="container-narrow">
+      
+      <!-- Introduction -->
+      <section class="content-section">
+        <h2>The Challenge</h2>
+        <p>
+          We wanted to create a Spotify Wrapped-style experience for League of Legends players - 
+          a beautiful, personalized summary of their gaming year. But there was a catch: 
+          we needed to process potentially hundreds of matches, analyze complex statistics, 
+          and deliver results in under 2 minutes.
+        </p>
+        <p>
+          The solution? A modern serverless architecture combining AWS services, 
+          AI-powered insights, and the Riot Games API.
+        </p>
+      </section>
+
+      <!-- Architecture Diagram -->
+      <section id="architecture" class="content-section">
+        <h2>System Architecture</h2>
+        <p>
+          Here's the complete infrastructure that powers LoL Wrapped:
+        </p>
+        <div class="diagram-container">
+          <img src="/diagram.png" alt="LoL Wrapped Architecture Diagram" class="architecture-diagram">
+        </div>
+        <p class="diagram-caption">
+          The full serverless stack: Frontend, GraphQL API, Database, Compute, and AI
+        </p>
+      </section>
+
+      <!-- Components -->
+      <section class="content-section">
+        <h2>Key Components</h2>
+
+        <div class="component-grid">
+          
+          <div class="component-card">
+            <h3>🎨 AWS Amplify</h3>
+            <p>
+              Hosts our Astro-based frontend with global CDN distribution. 
+              Every code push triggers an automatic build and deployment - 
+              zero-downtime updates in minutes.
+            </p>
+            <div class="tech-tags">
+              <span>Astro</span>
+              <span>React</span>
+              <span>TypeScript</span>
+              <span>Tailwind</span>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h3>⚡ AWS AppSync</h3>
+            <p>
+              Our GraphQL API layer. Handles all client requests, manages real-time 
+              subscriptions for live updates, and orchestrates between DynamoDB and Lambda.
+            </p>
+            <div class="tech-tags">
+              <span>GraphQL</span>
+              <span>VTL Resolvers</span>
+              <span>API Key Auth</span>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h3>💾 Amazon DynamoDB</h3>
+            <p>
+              NoSQL database storing wrapped data with millisecond latency. 
+              On-demand scaling means we only pay for what we use - perfect for 
+              bursty workloads.
+            </p>
+            <div class="tech-tags">
+              <span>NoSQL</span>
+              <span>DynamoDB Streams</span>
+              <span>On-Demand</span>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h3>🔥 AWS Lambda</h3>
+            <p>
+              Serverless Python functions that fetch data from Riot API, 
+              process hundreds of matches, calculate statistics, and generate insights.
+              Auto-scales from zero to thousands of concurrent executions.
+            </p>
+            <div class="tech-tags">
+              <span>Python 3.11</span>
+              <span>Boto3</span>
+              <span>Serverless</span>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h3>🚀 AWS App Runner</h3>
+            <p>
+              Runs our MCP (Model Context Protocol) server - a persistent HTTP service 
+              that exposes Riot API tools to AI agents. Container-based deployment with 
+              automatic scaling and health checks.
+            </p>
+            <div class="tech-tags">
+              <span>FastMCP</span>
+              <span>Docker</span>
+              <span>SSE</span>
+            </div>
+          </div>
+
+          <div class="component-card">
+            <h3>🤖 Amazon Bedrock</h3>
+            <p>
+              Powers AI-generated insights using Claude 4.5 Sonnet. Analyzes your playstyle, 
+              generates personalized commentary, and creates natural language summaries 
+              of your gaming year.
+            </p>
+            <div class="tech-tags">
+              <span>Claude 4.5</span>
+              <span>Pydantic AI</span>
+              <span>MCP</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Technical Details -->
+      <section class="content-section">
+        <h2>The Data Flow</h2>
+        <p>When you request your Wrapped, here's what happens behind the scenes:</p>
+        
+        <ol class="flow-steps">
+          <li>
+            <strong>Request Initiation:</strong> Your browser sends a GraphQL mutation 
+            to AppSync with your summoner name and region.
+          </li>
+          <li>
+            <strong>Status Tracking:</strong> AppSync creates a record in DynamoDB with 
+            status "PROCESSING" and returns immediately.
+          </li>
+          <li>
+            <strong>Lambda Invocation:</strong> AppSync triggers a Lambda function 
+            asynchronously to start data collection.
+          </li>
+          <li>
+            <strong>Riot API Calls:</strong> Lambda fetches your PUUID, summoner info, 
+            match history (up to 100 games), and champion masteries from Riot's API.
+          </li>
+          <li>
+            <strong>Analytics Processing:</strong> Our analytics engine calculates 
+            200+ statistics including KDA, winrates, temporal patterns, and achievement tracking.
+          </li>
+          <li>
+            <strong>AI Enhancement:</strong> Bedrock's Claude analyzes the data to 
+            generate personalized insights and natural language summaries.
+          </li>
+          <li>
+            <strong>Asset Enrichment:</strong> Champion splash arts and icons are 
+            fetched from Data Dragon CDN.
+          </li>
+          <li>
+            <strong>Final Update:</strong> Lambda writes the complete wrapped data 
+            back to DynamoDB with status "COMPLETED".
+          </li>
+          <li>
+            <strong>Client Display:</strong> Frontend polls AppSync every 3 seconds, 
+            detects completion, and renders your beautiful wrapped visualization.
+          </li>
+        </ol>
+      </section>
+
+      <!-- MCP Innovation -->
+      <section class="content-section">
+        <h2>MCP: The Secret Sauce</h2>
+        <p>
+          One of the most innovative parts of our architecture is the 
+          <strong>Model Context Protocol (MCP) server</strong>. This standardized 
+          interface lets AI models interact with external data sources in a structured way.
+        </p>
+        <p>
+          Our MCP server exposes Riot API functionality as "tools" that Claude can use. 
+          Instead of hardcoding API calls, we let the AI agent decide when and how 
+          to fetch data - making the system more flexible and intelligent.
+        </p>
+        <div class="code-block">
+          <pre><code># Example MCP tool
+@mcp.tool()
+async def get_player_wrapped(
+    game_name: str,
+    tag_line: str,
+    region: str,
+    max_matches: int = 100
+) -> str:
+    """
+    Generate a complete Wrapped for a player.
+    Returns JSON with stats, rankings, and insights.
+    """
+    # Fetch and analyze data...
+    return wrapped_json</code></pre>
+        </div>
+      </section>
+
+      <!-- Performance -->
+      <section class="content-section">
+        <h2>Performance & Scalability</h2>
+        <ul class="feature-list">
+          <li><strong>Sub-2-minute processing:</strong> From request to completed wrapped in ~90 seconds</li>
+          <li><strong>Rate limit handling:</strong> Smart throttling to respect Riot's 20 req/sec limit</li>
+          <li><strong>Cost-efficient:</strong> Serverless = $0 when idle, scales only when needed</li>
+          <li><strong>Global CDN:</strong> Frontend loads in &lt;1s from anywhere in the world</li>
+          <li><strong>Automatic scaling:</strong> Handles 1 user or 10,000 users without code changes</li>
+        </ul>
+      </section>
+
+      <!-- Tech Stack -->
+      <section class="content-section">
+        <h2>Complete Tech Stack</h2>
+        <div class="tech-stack">
+          <div class="stack-category">
+            <h4>Frontend</h4>
+            <p>Astro, React, TypeScript, Tailwind CSS, AWS Amplify</p>
+          </div>
+          <div class="stack-category">
+            <h4>Backend</h4>
+            <p>AWS Lambda (Python), AppSync (GraphQL), DynamoDB, App Runner</p>
+          </div>
+          <div class="stack-category">
+            <h4>AI & Analytics</h4>
+            <p>Amazon Bedrock (Claude 4.5), Pydantic AI, FastMCP, NumPy</p>
+          </div>
+          <div class="stack-category">
+            <h4>Infrastructure</h4>
+            <p>Terraform, CloudFormation, Docker, GitHub Actions</p>
+          </div>
+          <div class="stack-category">
+            <h4>External APIs</h4>
+            <p>Riot Games API, Data Dragon CDN</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Challenges -->
+      <section class="content-section">
+        <h2>Challenges We Solved</h2>
+        <div class="challenge-list">
+          <div class="challenge-item">
+            <h4>⚡ Rate Limiting</h4>
+            <p>
+              Riot's API has strict rate limits (20 req/s, 100 req/2min). We implemented 
+              intelligent request batching and exponential backoff to maximize throughput 
+              while staying compliant.
+            </p>
+          </div>
+          <div class="challenge-item">
+            <h4>🔄 Real-time Updates</h4>
+            <p>
+              Users don't want to wait staring at a loading screen. We use polling 
+              with GraphQL subscriptions ready for upgrade, showing progress updates 
+              as matches are processed.
+            </p>
+          </div>
+          <div class="challenge-item">
+            <h4>💰 Cost Optimization</h4>
+            <p>
+              By using serverless architecture and on-demand DynamoDB, we keep costs 
+              near zero during development and scale gracefully under load. Estimated 
+              cost: $0-10/month for moderate usage.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Future -->
+      <section class="content-section">
+        <h2>What's Next?</h2>
+        <ul class="feature-list">
+          <li>WebSocket subscriptions for true real-time updates</li>
+          <li>Social sharing with custom OG images</li>
+          <li>Multi-year comparison (compare 2024 vs 2025)</li>
+          <li>Team wrapped (aggregate stats for friend groups)</li>
+          <li>More AI-powered insights and predictions</li>
+        </ul>
+      </section>
+
+      <!-- CTA -->
+      <section class="content-section cta-section">
+        <h2>Try It Yourself</h2>
+        <p>
+          Ready to see your year in League of Legends? Get your personalized Wrapped now.
+        </p>
+        <div class="cta-buttons">
+          <a href="/#start" class="btn-primary-blog">Get Your Wrapped</a>
+          <a href="https://github.com/alejofig/lol-wrapper-agent" target="_blank" class="btn-secondary-blog">View on GitHub</a>
+        </div>
+      </section>
+
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-links">
+          <a href="/">Home</a>
+          <a href="https://github.com/alejofig/lol-wrapper-agent" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://developer.riotgames.com/" target="_blank" rel="noopener">Riot API</a>
+        </div>
+      </div>
+      <div class="footer-legal">
+        <p class="footer-disclaimer">
+          LoL Wrapped isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games 
+          or anyone officially involved in producing or managing Riot Games properties. 
+          Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
+        </p>
+        <p class="footer-copyright">
+          © 2025 LoL Wrapped
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #0BC5EA;
+      --primary-dark: #0891b2;
+      --secondary: #c084fc;
+      --accent: #C8AA6E;
+      --gold: #C8AA6E;
+      --blue: #0AC8B9;
+      --bg-dark: #0A0E14;
+      --bg-darker: #000000;
+      --bg-card: #0F1419;
+      --text: #CDBE91;
+      --text-muted: #5B5A56;
+      --border: #1E2328;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .container-narrow {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 14, 26, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 800;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.3s;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    /* Blog Hero */
+    .blog-hero {
+      padding: 8rem 2rem 4rem;
+      text-align: center;
+      background: linear-gradient(180deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .blog-title {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 900;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .blog-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+
+    .blog-meta {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Blog Content */
+    .blog-content {
+      padding: 4rem 0;
+    }
+
+    .content-section {
+      margin-bottom: 4rem;
+    }
+
+    .content-section h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--gold);
+    }
+
+    .content-section h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .content-section h4 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      color: var(--primary);
+    }
+
+    .content-section p {
+      margin-bottom: 1rem;
+      font-size: 1.05rem;
+    }
+
+    /* Diagram */
+    .diagram-container {
+      margin: 2rem 0;
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+    }
+
+    .architecture-diagram {
+      width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+    }
+
+    .diagram-caption {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-style: italic;
+      margin-top: 1rem;
+    }
+
+    /* Component Grid */
+    .component-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .component-card {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+      transition: transform 0.3s, border-color 0.3s;
+    }
+
+    .component-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+    }
+
+    .component-card h3 {
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+
+    .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .tech-tags span {
+      background: rgba(11, 197, 234, 0.1);
+      color: var(--primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* Flow Steps */
+    .flow-steps {
+      list-style: none;
+      counter-reset: step-counter;
+      padding-left: 0;
+    }
+
+    .flow-steps li {
+      counter-increment: step-counter;
+      margin-bottom: 1.5rem;
+      padding-left: 3.5rem;
+      position: relative;
+    }
+
+    .flow-steps li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2.5rem;
+      height: 2.5rem;
+      background: var(--gold);
+      color: var(--bg-dark);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    /* Feature List */
+    .feature-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .feature-list li {
+      padding: 0.75rem 0;
+      padding-left: 2rem;
+      position: relative;
+    }
+
+    .feature-list li::before {
+      content: "✨";
+      position: absolute;
+      left: 0;
+    }
+
+    /* Code Block */
+    .code-block {
+      background: var(--bg-darker);
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      margin: 2rem 0;
+    }
+
+    .code-block pre {
+      margin: 0;
+    }
+
+    .code-block code {
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.9rem;
+      color: var(--primary);
+      line-height: 1.6;
+    }
+
+    /* Tech Stack */
+    .tech-stack {
+      display: grid;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .stack-category {
+      background: var(--bg-card);
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border);
+    }
+
+    .stack-category h4 {
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .stack-category p {
+      margin: 0;
+      color: var(--text-muted);
+    }
+
+    /* Challenges */
+    .challenge-list {
+      display: grid;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .challenge-item {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 1rem;
+      border-left: 4px solid var(--primary);
+    }
+
+    .challenge-item h4 {
+      margin-bottom: 0.75rem;
+    }
+
+    .challenge-item p {
+      margin: 0;
+      color: var(--text-muted);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: var(--bg-card);
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary-blog, .btn-secondary-blog {
+      padding: 1rem 2rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: inline-block;
+    }
+
+    .btn-primary-blog {
+      background: var(--gold);
+      color: var(--bg-dark);
+    }
+
+    .btn-secondary-blog {
+      background: transparent;
+      color: var(--text);
+      border: 2px solid var(--border);
+    }
+
+    .btn-primary-blog:hover, .btn-secondary-blog:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-darker);
+      padding: 3rem 0 2rem;
+      border-top: 1px solid var(--border);
+      margin-top: 4rem;
+    }
+
+    .footer-content {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: var(--gold);
+    }
+
+    .footer-legal {
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-disclaimer {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      max-width: 800px;
+      margin: 0 auto 1rem;
+      line-height: 1.6;
+    }
+
+    .footer-copyright {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .blog-hero {
+        padding: 6rem 1rem 3rem;
+      }
+
+      .component-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-steps li {
+        padding-left: 3rem;
+      }
+
+      .flow-steps li::before {
+        width: 2rem;
+        height: 2rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</body>
+</html>
+
