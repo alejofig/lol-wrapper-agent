@@ -1,0 +1,218 @@
+---
+/**
+ * Página dinámica del Wrapped
+ * URL: /wrapped/NamiNami-LAN
+ * 
+ * Esta página se genera estáticamente con getStaticPaths vacío
+ * Todo el contenido se carga client-side via JavaScript
+ */
+
+import WrappedViewer from '../../components/WrappedViewer';
+
+// Para sitios estáticos, generamos una página genérica
+// El contenido real se obtiene client-side
+export async function getStaticPaths() {
+  // Retornamos un array vacío para que Astro genere la estructura
+  // pero todo el contenido será client-side
+  return [];
+}
+
+// Obtener parámetros de la URL
+const { player } = Astro.params;
+
+// Parsear gameName y tagLine del slug
+const parts = player?.split('-') || ['', ''];
+const gameName = decodeURIComponent(parts[0] || '');
+const tagLine = decodeURIComponent(parts[1] || 'LAN');
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{gameName}#{tagLine} - Wrapped 2025 | LoL Wrapped</title>
+  <meta name="description" content={`Wrapped 2025 de ${gameName}#${tagLine}. Descubre tus estadísticas, campeones más jugados y logros del año.`}>
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content={`${gameName}#${tagLine} - Wrapped 2025`}>
+  <meta property="og:description" content="Mi año en League of Legends">
+  <meta property="og:image" content="/logo.png">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#0A0E14">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container">
+      <div class="nav-content">
+        <a href="/" class="logo">
+          <img src="/logo.svg" alt="LoL Wrapped" class="logo-icon">
+          <span class="logo-text">LoL Wrapped</span>
+        </a>
+        <div class="player-info">
+          <span class="player-name">{gameName}#{tagLine}</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <WrappedViewer 
+      client:load
+      gameName={gameName}
+      tagLine={tagLine}
+    />
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p class="footer-disclaimer">
+          LoL Wrapped isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games.
+          League of Legends and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
+        </p>
+        <p class="footer-copyright">
+          © 2025 LoL Wrapped
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #0BC5EA;
+      --primary-dark: #0891b2;
+      --secondary: #c084fc;
+      --accent: #C8AA6E;
+      --gold: #C8AA6E;
+      --blue: #0AC8B9;
+      --bg-dark: #0A0E14;
+      --bg-darker: #000000;
+      --bg-card: #0F1419;
+      --text: #CDBE91;
+      --text-muted: #5B5A56;
+      --border: #1E2328;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 14, 26, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 800;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .player-name {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding-top: 5rem; /* Space for fixed nav */
+      padding-bottom: 2rem;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-darker);
+      padding: 2rem 0;
+      margin-top: 4rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-content {
+      text-align: center;
+    }
+
+    .footer-disclaimer {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      max-width: 800px;
+      margin: 0 auto 1rem;
+      line-height: 1.6;
+    }
+
+    .footer-copyright {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .player-name {
+        font-size: 0.9rem;
+      }
+
+      .logo-text {
+        display: none;
+      }
+    }
+  </style>
+</body>
+</html>
+

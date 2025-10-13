@@ -1,0 +1,993 @@
+---
+// League of Legends Wrapped Landing Page
+const currentYear = new Date().getFullYear();
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoL Wrapped - Your Year in League of Legends</title>
+  <meta name="description" content="Your year in League of Legends. Discover your stats, champions, and achievements.">
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="LoL Wrapped - Your Year in League of Legends">
+  <meta property="og:description" content="Your League highlights, ranked climbs, and champion picks. All in one place.">
+  <meta property="og:image" content="/logo.svg">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="LoL Wrapped">
+  <meta name="twitter:description" content="Your year in League of Legends">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#0A0E14">
+	</head>
+	<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container">
+      <div class="nav-content">
+        <div class="logo">
+          <img src="/logo.svg" alt="LoL Wrapped" class="logo-icon">
+          <span class="logo-text">LoL Wrapped</span>
+        </div>
+        <div class="nav-links">
+          <a href="#about">About</a>
+          <a href="#start" class="btn-primary">Get Started</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-bg">
+      <!-- League of Legends themed background images -->
+      <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg" alt="" class="bg-image bg-1">
+      <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg" alt="" class="bg-image bg-2">
+      <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg" alt="" class="bg-image bg-3">
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <span class="year-badge">2025</span>
+          <span class="wrapped-text">Wrapped</span>
+        </h1>
+        <p class="hero-subtitle">
+          Your League highlights, ranked climbs,<br>
+          and champion picks. All in one place.
+        </p>
+        <div class="hero-buttons">
+          <a href="#start" class="btn-hero">
+            Get Your Wrapped
+          </a>
+          <a href="/demo" class="btn-hero-secondary">
+            See Demo
+          </a>
+        </div>
+        <p class="hero-note">
+          Keep playing what you love, and we'll get in touch when it's ready.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="about">
+    <div class="container-narrow">
+      <div class="about-grid">
+        <div class="about-card">
+          <h3>Your year<br>in the Rift</h3>
+          <p>Get a deeper look into your season with a recap made just for you.</p>
+        </div>
+
+        <div class="about-card">
+          <h3>A conversation<br>starter</h3>
+          <p>Share your Wrapped with friends and show them who's the real carry.</p>
+        </div>
+
+        <div class="about-card">
+          <h3>Only your<br>Riot ID needed</h3>
+          <p>To get your Wrapped, all you need is an account and a few hours of playing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section id="start" class="cta">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="cta-title">Ready to discover your year?</h2>
+        
+        <form class="search-form">
+          <div class="form-group">
+            <label for="gameName" class="form-label">Summoner Name</label>
+            <div class="input-group">
+              <input 
+                type="text" 
+                placeholder="Your summoner name" 
+                class="input-field"
+                id="gameName"
+                required
+              >
+              <span class="input-separator">#</span>
+              <input 
+                type="text" 
+                placeholder="TAG" 
+                class="input-field input-tag"
+                id="tagLine"
+                required
+              >
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="region" class="form-label">Region</label>
+            <select class="select-field" id="region">
+              <option value="na1">NA - North America</option>
+              <option value="euw1">EUW - Europe West</option>
+              <option value="eun1">EUNE - Europe Nordic & East</option>
+              <option value="kr">KR - Korea</option>
+              <option value="br1">BR - Brazil</option>
+              <option value="la1">LAN - Latin America North</option>
+              <option value="la2">LAS - Latin America South</option>
+              <option value="jp1">JP - Japan</option>
+              <option value="oc1">OCE - Oceania</option>
+              <option value="tr1">TR - Turkey</option>
+              <option value="ru">RU - Russia</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-submit">
+            Get Your Wrapped
+          </button>
+        </form>
+
+        <p class="cta-note">
+          Download our mobile app to experience Wrapped at its best. <span class="coming-soon">(Coming soon)</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-links">
+          <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://developer.riotgames.com/" target="_blank" rel="noopener">Riot API</a>
+          <a href="#about">About</a>
+          <a href="/demo">Demo</a>
+        </div>
+      </div>
+      <div class="footer-legal">
+        <p class="footer-disclaimer">
+          LoL Wrapped isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games 
+          or anyone officially involved in producing or managing Riot Games properties. 
+          Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
+        </p>
+        <p class="footer-copyright">
+          © 2025 LoL Wrapped
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #0BC5EA;
+      --primary-dark: #0891b2;
+      --secondary: #c084fc;
+      --accent: #C8AA6E;
+      --gold: #C8AA6E;
+      --blue: #0AC8B9;
+      --bg-dark: #0A0E14;
+      --bg-darker: #000000;
+      --bg-card: #0F1419;
+      --text: #CDBE91;
+      --text-muted: #5B5A56;
+      --border: #1E2328;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      line-height: 1.5;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 14, 26, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 5rem;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .bg-image {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      animation: bgSlide 15s infinite;
+    }
+
+    .bg-1 { animation-delay: 0s; }
+    .bg-2 { animation-delay: 5s; }
+    .bg-3 { animation-delay: 10s; }
+
+    @keyframes bgSlide {
+      0%, 33.33% { opacity: 0.15; }
+      33.34%, 100% { opacity: 0; }
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: 
+        linear-gradient(180deg, rgba(10, 14, 26, 0.7) 0%, rgba(10, 14, 26, 0.95) 100%),
+        radial-gradient(circle at 20% 50%, rgba(11, 197, 234, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(192, 132, 252, 0.1) 0%, transparent 50%);
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 0.5rem 1.5rem;
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin-bottom: 2rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.9rem;
+    }
+
+    .badge-icon {
+      width: 24px;
+      height: 24px;
+      filter: drop-shadow(0 0 8px rgba(11, 197, 234, 0.5));
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      padding: 1rem 1.5rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .hero-stat .stat-icon {
+      font-size: 2rem;
+    }
+
+    .hero-stat .stat-text {
+      text-align: left;
+    }
+
+    .hero-stat .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .hero-stat .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .hero-title {
+      font-size: clamp(4rem, 14vw, 11rem);
+      font-weight: 900;
+      line-height: 0.85;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      letter-spacing: -0.02em;
+    }
+
+    .year-badge {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      color: var(--text-muted);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .wrapped-text {
+      color: var(--gold);
+      letter-spacing: -0.03em;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--blue) 50%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s infinite;
+      background-size: 200% 100%;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--text);
+      margin-bottom: 3rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .hero-note {
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero {
+      background: var(--text);
+      color: var(--bg-dark);
+      padding: 1rem 2.5rem;
+      border-radius: 500px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: transform 0.1s, background 0.2s;
+      display: inline-block;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-hero:hover {
+      transform: scale(1.04);
+      background: var(--gold);
+    }
+
+    .btn-hero-secondary {
+      background: transparent;
+      color: var(--text);
+      padding: 1rem 2.5rem;
+      border: 1.5px solid var(--text-muted);
+      border-radius: 500px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+      display: inline-block;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-hero-secondary:hover {
+      border-color: var(--text);
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold) 0%, #a17d36 100%);
+      color: #010A13;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: 2px solid var(--gold);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(200, 155, 60, 0.5);
+      background: linear-gradient(135deg, #d4af37 0%, var(--gold) 100%);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      padding: 0.75rem 1.5rem;
+      border: 2px solid var(--border);
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 600;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      background: rgba(11, 197, 234, 0.1);
+    }
+
+    .btn-large {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+    }
+
+    .btn-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* About Section */
+    .about {
+      padding: 8rem 0;
+      background: var(--bg-dark);
+    }
+
+    .container-narrow {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 3rem;
+    }
+
+    .about-card {
+      text-align: left;
+    }
+
+    .about-card h3 {
+      font-size: 2rem;
+      margin-bottom: 1.25rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .about-card p {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .section-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 2rem;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+    }
+
+    .feature-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(11, 197, 234, 0.1);
+      border-radius: 1rem;
+      padding: 1rem;
+    }
+
+    .feature-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(11, 197, 234, 0.3));
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+    }
+
+    /* Champions Showcase */
+    .champions-showcase {
+      padding: 6rem 0;
+      background: linear-gradient(180deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
+    }
+
+    .champions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 1.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .champion-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: 0.75rem;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .champion-item:hover {
+      transform: translateY(-5px) scale(1.05);
+      border-color: var(--gold);
+      box-shadow: 0 10px 30px rgba(200, 155, 60, 0.3);
+    }
+
+    .champion-item img {
+      width: 80px;
+      height: 80px;
+      border-radius: 0.5rem;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 20px rgba(200, 155, 60, 0.2);
+    }
+
+    .champion-item span {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* How it Works Section */
+    .how-it-works {
+      padding: 8rem 0;
+    }
+
+    .steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .step-number {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold) 0%, #a17d36 100%);
+      border: 3px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      color: #010A13;
+      box-shadow: 0 0 30px rgba(200, 155, 60, 0.3);
+    }
+
+    .step-content h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-content p {
+      color: var(--text-muted);
+    }
+
+    .step-connector {
+      width: 100px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold) 0%, var(--blue) 100%);
+      display: none;
+      box-shadow: 0 0 10px rgba(200, 155, 60, 0.5);
+    }
+
+    @media (min-width: 768px) {
+      .step-connector {
+        display: block;
+      }
+    }
+
+    /* CTA Section */
+    .cta {
+      padding: 8rem 0;
+      background: var(--bg-darker);
+    }
+
+    .cta-content {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .cta-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 2.5rem;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .cta-note {
+      margin-top: 2rem;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .coming-soon {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .search-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.625rem;
+      letter-spacing: 0;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 0.375rem 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .input-group:focus-within {
+      border-color: var(--text-muted);
+    }
+
+    .input-field {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1rem;
+      padding: 0.75rem;
+      outline: none;
+      font-weight: 500;
+    }
+
+    .input-field::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .input-tag {
+      flex: 0 0 100px;
+    }
+
+    .input-separator {
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .select-field {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--text);
+      font-size: 1rem;
+      padding: 0.875rem 1rem;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      font-weight: 500;
+      width: 100%;
+    }
+
+    .select-field:focus {
+      border-color: var(--text-muted);
+    }
+
+    .btn-submit {
+      background: var(--text);
+      color: var(--bg-dark);
+      border: none;
+      border-radius: 500px;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.2s;
+      display: block;
+      width: 100%;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-submit:hover {
+      transform: scale(1.02);
+      background: var(--gold);
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-dark);
+      padding: 4rem 0 2rem;
+    }
+
+    .footer-content {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: var(--gold);
+    }
+
+    .footer-legal {
+      text-align: center;
+      border-top: 1px solid var(--border);
+      padding-top: 2rem;
+    }
+
+    .footer-disclaimer {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      max-width: 800px;
+      margin: 0 auto 1rem;
+      line-height: 1.6;
+    }
+
+    .footer-copyright {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links a:not(.btn-primary) {
+        display: none;
+      }
+
+      .hero-title {
+        font-size: 4rem;
+      }
+
+      .year-badge {
+        font-size: 2rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1.1rem;
+      }
+
+      .cta-title {
+        font-size: 2.5rem;
+      }
+
+      .about-grid {
+        gap: 3rem;
+      }
+
+      .about-card h3 {
+        font-size: 1.5rem;
+      }
+
+      .about-card p {
+        font-size: 1rem;
+      }
+
+      .btn-hero, .btn-hero-secondary {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+      }
+    }
+  </style>
+
+  <script>
+    // Handle form submission - Redirect to wrapped page
+    document.querySelector('.search-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const gameName = (document.getElementById('gameName') as HTMLInputElement).value;
+      const tagLine = (document.getElementById('tagLine') as HTMLInputElement).value;
+      
+      if (!gameName || !tagLine) {
+        alert('Please enter your summoner name and tag');
+        return;
+      }
+      
+      // Redirect to wrapped page with query parameter
+      const playerParam = `${encodeURIComponent(gameName)}-${encodeURIComponent(tagLine)}`;
+      window.location.href = `/wrapped?player=${playerParam}`;
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', (e) => {
+        e.preventDefault();
+        const href = anchor.getAttribute('href');
+        const target = document.querySelector(href || '');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+	</body>
+</html>
