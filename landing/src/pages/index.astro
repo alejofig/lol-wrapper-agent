@@ -176,7 +176,8 @@ const currentYear = new Date().getFullYear();
           Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
         </p>
         <p class="footer-copyright">
-          © 2025 LoL Wrapped
+          © 2025 LoL Wrapped · Built with ❤️ by <a href="https://www.alejofig.com/" target="_blank" rel="noopener" class="footer-author">Alejofig</a> · 
+          <a href="https://www.linkedin.com/in/alejofig/" target="_blank" rel="noopener" class="footer-author">LinkedIn</a>
         </p>
       </div>
     </div>
@@ -916,6 +917,18 @@ const currentYear = new Date().getFullYear();
     .footer-copyright {
       font-size: 0.85rem;
       color: var(--text-muted);
+    }
+
+    .footer-author {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .footer-author:hover {
+      color: var(--primary);
+      text-decoration: underline;
     }
 
     /* Responsive */

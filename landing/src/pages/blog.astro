@@ -47,7 +47,7 @@ const currentYear = new Date().getFullYear();
       <h1 class="blog-title">How We Built LoL Wrapped</h1>
       <p class="blog-subtitle">A deep dive into the serverless architecture powering your year in League of Legends</p>
       <div class="blog-meta">
-        <span>By Alejandro Figueroa</span>
+        <span>By <a href="https://www.alejofig.com/" target="_blank" rel="noopener" class="author-link">Alejandro Figueroa</a></span>
         <span>•</span>
         <span>October 2025</span>
       </div>
@@ -370,7 +370,8 @@ async def get_player_wrapped(
           Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
         </p>
         <p class="footer-copyright">
-          © 2025 LoL Wrapped
+          © 2025 LoL Wrapped · Built with ❤️ by <a href="https://www.alejofig.com/" target="_blank" rel="noopener" class="footer-author">Alejofig</a> · 
+          <a href="https://www.linkedin.com/in/alejofig/" target="_blank" rel="noopener" class="footer-author">LinkedIn</a>
         </p>
       </div>
     </div>
@@ -499,6 +500,18 @@ async def get_player_wrapped(
       justify-content: center;
       color: var(--text-muted);
       font-size: 0.95rem;
+    }
+
+    .author-link {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .author-link:hover {
+      color: var(--primary);
+      text-decoration: underline;
     }
 
     /* Blog Content */
@@ -804,6 +817,18 @@ async def get_player_wrapped(
     .footer-copyright {
       font-size: 0.85rem;
       color: var(--text-muted);
+    }
+
+    .footer-author {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .footer-author:hover {
+      color: var(--primary);
+      text-decoration: underline;
     }
 
     /* Responsive */
