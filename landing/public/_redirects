@@ -1,0 +1,6 @@
+# Redirect for Riot Games verification
+//riot.txt   /riot.txt   200
+
+# SPA fallback for client-side routing
+/*    /index.html   200
+
