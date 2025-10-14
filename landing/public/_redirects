@@ -1,6 +1,12 @@
-# Redirect for Riot Games verification
-//riot.txt   /riot.txt   200
+# Redirect for Riot Games verification with double slash
+//riot.txt   /riot.txt   200!
 
-# SPA fallback for client-side routing
+# Serve static files directly
+/riot.txt   /riot.txt   200!
+/favicon.svg   /favicon.svg   200!
+/logo.svg   /logo.svg   200!
+/logo.png   /logo.png   200!
+/diagram.png   /diagram.png   200!
+
+# SPA fallback for everything else
 /*    /index.html   200
-
