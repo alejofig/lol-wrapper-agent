@@ -68,67 +68,152 @@ export default function PlayerSearch({ onSearch }: PlayerSearchProps) {
 
       <style>{`
         .player-search {
-          max-width: 500px;
+          max-width: 550px;
           margin: 2rem auto;
-          padding: 2rem;
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 1rem;
-          backdrop-filter: blur(10px);
+          padding: 3rem;
+          background: linear-gradient(145deg, rgba(1, 10, 19, 0.95), rgba(15, 35, 65, 0.85));
+          border: 2px solid rgba(200, 155, 60, 0.4);
+          border-radius: 16px;
+          backdrop-filter: blur(15px);
+          box-shadow: 
+            0 8px 32px rgba(0, 9, 19, 0.6),
+            0 0 40px rgba(200, 155, 60, 0.2),
+            inset 0 1px 0 rgba(200, 155, 60, 0.3);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .player-search::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: radial-gradient(ellipse at center, rgba(200, 155, 60, 0.05) 0%, transparent 70%);
+          pointer-events: none;
         }
 
         .search-form {
           display: flex;
           flex-direction: column;
-          gap: 1.5rem;
+          gap: 2rem;
+          position: relative;
+          z-index: 1;
         }
 
         .form-group {
           display: flex;
           flex-direction: column;
-          gap: 0.5rem;
+          gap: 0.8rem;
         }
 
         .form-group label {
-          font-weight: 600;
-          color: #f0f0f0;
+          font-weight: 700;
+          color: #C8AA6E;
           font-size: 0.9rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          text-shadow: 0 0 5px rgba(200, 170, 110, 0.4);
         }
 
         .input-field {
-          padding: 0.75rem 1rem;
-          border: 2px solid rgba(255, 255, 255, 0.1);
-          border-radius: 0.5rem;
-          background: rgba(0, 0, 0, 0.3);
-          color: #fff;
+          padding: 1rem 1.5rem;
+          border: 2px solid rgba(200, 155, 60, 0.3);
+          border-radius: 8px;
+          background: linear-gradient(145deg, rgba(0, 9, 19, 0.8), rgba(15, 35, 65, 0.6));
+          color: #F0E6D2;
           font-size: 1rem;
-          transition: all 0.3s ease;
+          font-weight: 500;
+          transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+          box-shadow: inset 0 2px 4px rgba(0, 9, 19, 0.5);
         }
 
         .input-field:focus {
           outline: none;
-          border-color: #5865f2;
-          background: rgba(0, 0, 0, 0.5);
+          border-color: rgba(200, 155, 60, 0.8);
+          background: linear-gradient(145deg, rgba(15, 35, 65, 0.9), rgba(200, 155, 60, 0.1));
+          box-shadow: 
+            inset 0 2px 4px rgba(0, 9, 19, 0.7),
+            0 0 20px rgba(200, 155, 60, 0.3),
+            0 4px 15px rgba(0, 9, 19, 0.4);
+          color: #F0E6D2;
+        }
+
+        .input-field::placeholder {
+          color: #A09B8C;
         }
 
         .btn-primary {
-          padding: 1rem 2rem;
-          background: linear-gradient(135deg, #5865f2, #4752c4);
-          color: white;
-          border: none;
-          border-radius: 0.5rem;
+          padding: 1.2rem 2.5rem;
+          background: linear-gradient(145deg, rgba(200, 155, 60, 0.9), rgba(200, 155, 60, 0.7));
+          color: #0F2341;
+          border: 2px solid rgba(200, 155, 60, 0.6);
+          border-radius: 8px;
           font-size: 1.1rem;
-          font-weight: 600;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+          box-shadow: 
+            0 4px 15px rgba(0, 9, 19, 0.4),
+            0 0 20px rgba(200, 155, 60, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .btn-primary::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+          transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+          left: 100%;
         }
 
         .btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 20px rgba(88, 101, 242, 0.3);
+          transform: translateY(-3px);
+          background: linear-gradient(145deg, rgba(200, 155, 60, 1), rgba(200, 155, 60, 0.8));
+          border-color: rgba(200, 155, 60, 1);
+          box-shadow: 
+            0 8px 25px rgba(0, 9, 19, 0.6),
+            0 0 30px rgba(200, 155, 60, 0.5),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
         .btn-primary:active {
-          transform: translateY(0);
+          transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+          .player-search {
+            max-width: 90%;
+            padding: 2rem 1.5rem;
+            margin: 1rem auto;
+          }
+
+          .form-group label {
+            font-size: 0.9rem;
+          }
+
+          .input-field {
+            padding: 0.9rem 1.2rem;
+            font-size: 1rem;
+          }
+
+          .btn-primary {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+          }
         }
       `}</style>
     </div>

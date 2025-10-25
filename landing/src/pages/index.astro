@@ -131,7 +131,7 @@ const currentYear = new Date().getFullYear();
           
           <div class="form-group">
             <label for="region" class="form-label">Region</label>
-            <select class="select-field" id="region">
+            <select class="select-field region-select" id="region">
               <option value="na1">NA - North America</option>
               <option value="euw1">EUW - Europe West</option>
               <option value="eun1">EUNE - Europe Nordic & East</option>
@@ -144,6 +144,28 @@ const currentYear = new Date().getFullYear();
               <option value="tr1">TR - Turkey</option>
               <option value="ru">RU - Russia</option>
             </select>
+            <style>
+              .region-select {
+                background: #1A1D22;
+                color: #FFDCA6;
+                border: 2px solid #C8AA6E;
+                border-radius: 8px;
+                padding: 0.55em 1.2em;
+                font-size: 1.05rem;
+                font-weight: 600;
+                appearance: none;
+                outline: none;
+                transition: border 0.2s;
+              }
+              .region-select:focus {
+                border-color: #C89B3C;
+                box-shadow: 0 0 0 2px #c89b3c44;
+              }
+              .region-select option {
+                background: #20232A;
+                color: #FFDCA6;
+              }
+            </style>
           </div>
 
           <button type="submit" class="btn-submit">
@@ -191,18 +213,22 @@ const currentYear = new Date().getFullYear();
     }
 
     :root {
-      --primary: #0BC5EA;
-      --primary-dark: #0891b2;
-      --secondary: #c084fc;
+      --primary: #C89B3C;
+      --primary-dark: #a17d36;
+      --secondary: #C8AA6E;
       --accent: #C8AA6E;
-      --gold: #C8AA6E;
-      --blue: #0AC8B9;
-      --bg-dark: #0A0E14;
-      --bg-darker: #000000;
-      --bg-card: #0F1419;
-      --text: #CDBE91;
-      --text-muted: #5B5A56;
-      --border: #1E2328;
+      --gold: #C89B3C;
+      --gold-light: #C8AA6E;
+      --blue-dark: rgba(1, 10, 19, 1);
+      --blue-medium: rgba(15, 35, 65, 1);
+      --bg-dark: #010A13;
+      --bg-darker: #000913;
+      --bg-card: rgba(1, 10, 19, 0.8);
+      --text: #F0E6D2;
+      --text-muted: #A09B8C;
+      --text-secondary: #C8AA6E;
+      --border: rgba(200, 155, 60, 0.3);
+      --border-hover: rgba(200, 155, 60, 0.6);
     }
 
     body {
@@ -309,9 +335,9 @@ const currentYear = new Date().getFullYear();
       position: absolute;
       inset: 0;
       background: 
-        linear-gradient(180deg, rgba(10, 14, 26, 0.7) 0%, rgba(10, 14, 26, 0.95) 100%),
-        radial-gradient(circle at 20% 50%, rgba(11, 197, 234, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 50%, rgba(192, 132, 252, 0.1) 0%, transparent 50%);
+        linear-gradient(180deg, rgba(1, 10, 19, 0.7) 0%, rgba(1, 10, 19, 0.95) 100%),
+        radial-gradient(circle at 20% 50%, rgba(200, 155, 60, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(15, 35, 65, 0.2) 0%, transparent 50%);
       z-index: 1;
     }
 
@@ -386,9 +412,9 @@ const currentYear = new Date().getFullYear();
     }
 
     .hero-title {
-      font-size: clamp(4rem, 14vw, 11rem);
+      font-size: clamp(2.5rem, 8vw, 6rem);
       font-weight: 900;
-      line-height: 0.85;
+      line-height: 0.9;
       margin-bottom: 1.5rem;
       display: flex;
       flex-direction: column;
@@ -397,7 +423,7 @@ const currentYear = new Date().getFullYear();
     }
 
     .year-badge {
-      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-size: clamp(1.5rem, 4vw, 3rem);
       color: var(--text-muted);
       font-weight: 800;
       letter-spacing: -0.01em;
@@ -448,62 +474,128 @@ const currentYear = new Date().getFullYear();
     }
 
     .btn-hero {
-      background: var(--text);
-      color: var(--bg-dark);
-      padding: 1rem 2.5rem;
-      border-radius: 500px;
+      background: linear-gradient(145deg, rgba(200, 155, 60, 0.9), rgba(200, 155, 60, 0.7));
+      color: #0F2341;
+      padding: 1.2rem 2.5rem;
+      border: 2px solid rgba(200, 155, 60, 0.6);
+      border-radius: 12px;
       text-decoration: none;
-      font-weight: 700;
-      font-size: 0.95rem;
-      transition: transform 0.1s, background 0.2s;
+      font-weight: 800;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
       display: inline-block;
-      letter-spacing: 0.02em;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      box-shadow: 
+        0 4px 15px rgba(0, 9, 19, 0.4),
+        0 0 20px rgba(200, 155, 60, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-hero:hover::before {
+      left: 100%;
     }
 
     .btn-hero:hover {
-      transform: scale(1.04);
-      background: var(--gold);
+      transform: translateY(-3px);
+      background: linear-gradient(145deg, rgba(200, 155, 60, 1), rgba(200, 155, 60, 0.8));
+      border-color: rgba(200, 155, 60, 1);
+      box-shadow: 
+        0 8px 25px rgba(0, 9, 19, 0.6),
+        0 0 30px rgba(200, 155, 60, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
     }
 
     .btn-hero-secondary {
-      background: transparent;
-      color: var(--text);
-      padding: 1rem 2.5rem;
-      border: 1.5px solid var(--text-muted);
-      border-radius: 500px;
+      background: linear-gradient(145deg, rgba(1, 10, 19, 0.8), rgba(15, 35, 65, 0.6));
+      color: var(--text-secondary);
+      padding: 1.2rem 2.5rem;
+      border: 2px solid var(--border);
+      border-radius: 12px;
       text-decoration: none;
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: border-color 0.2s;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
       display: inline-block;
-      letter-spacing: 0.02em;
+      box-shadow: 
+        0 4px 15px rgba(0, 9, 19, 0.4),
+        inset 0 1px 0 rgba(200, 155, 60, 0.1);
     }
 
     .btn-hero-secondary:hover {
-      border-color: var(--text);
+      border-color: var(--border-hover);
+      background: linear-gradient(145deg, rgba(15, 35, 65, 0.9), rgba(200, 155, 60, 0.1));
+      transform: translateY(-3px);
+      box-shadow: 
+        0 8px 25px rgba(0, 9, 19, 0.6),
+        0 0 25px rgba(200, 155, 60, 0.3),
+        inset 0 1px 0 rgba(200, 155, 60, 0.2);
     }
 
     /* Buttons */
     .btn-primary {
-      background: linear-gradient(135deg, var(--gold) 0%, #a17d36 100%);
-      color: #010A13;
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.5rem;
+      background: linear-gradient(145deg, rgba(200, 155, 60, 0.9), rgba(200, 155, 60, 0.7));
+      color: #0F2341;
+      padding: 1rem 1.8rem;
+      border: 2px solid rgba(200, 155, 60, 0.6);
+      border-radius: 8px;
       text-decoration: none;
-      font-weight: 700;
-      transition: transform 0.2s, box-shadow 0.2s;
+      font-weight: 800;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border: 2px solid var(--gold);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      box-shadow: 
+        0 4px 15px rgba(0, 9, 19, 0.4),
+        0 0 20px rgba(200, 155, 60, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
     }
 
     .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 40px rgba(200, 155, 60, 0.5);
-      background: linear-gradient(135deg, #d4af37 0%, var(--gold) 100%);
+      transform: translateY(-3px);
+      background: linear-gradient(145deg, rgba(200, 155, 60, 1), rgba(200, 155, 60, 0.8));
+      border-color: rgba(200, 155, 60, 1);
+      box-shadow: 
+        0 8px 25px rgba(0, 9, 19, 0.6),
+        0 0 30px rgba(200, 155, 60, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
     }
 
     .btn-secondary {
@@ -552,6 +644,42 @@ const currentYear = new Date().getFullYear();
 
     .about-card {
       text-align: left;
+      background: linear-gradient(145deg, rgba(1, 10, 19, 0.8), rgba(15, 35, 65, 0.6));
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      box-shadow: 
+        0 8px 32px rgba(0, 9, 19, 0.5),
+        0 0 40px rgba(200, 155, 60, 0.15),
+        inset 0 1px 0 rgba(200, 155, 60, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(ellipse at center, rgba(200, 155, 60, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .about-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .about-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-8px);
+      box-shadow: 
+        0 12px 40px rgba(0, 9, 19, 0.6),
+        0 0 30px rgba(200, 155, 60, 0.3),
+        inset 0 1px 0 rgba(200, 155, 60, 0.3);
     }
 
     .about-card h3 {
@@ -559,8 +687,11 @@ const currentYear = new Date().getFullYear();
       margin-bottom: 1.25rem;
       font-weight: 800;
       line-height: 1.2;
-      color: var(--text);
+      color: var(--gold);
       letter-spacing: -0.02em;
+      text-shadow: 
+        0 0 15px rgba(200, 155, 60, 0.7),
+        0 2px 4px rgba(0, 9, 19, 0.8);
     }
 
     .about-card p {
@@ -761,6 +892,10 @@ const currentYear = new Date().getFullYear();
       margin-bottom: 2.5rem;
       letter-spacing: -0.02em;
       line-height: 1.1;
+      color: var(--gold);
+      text-shadow: 
+        0 0 20px rgba(200, 155, 60, 0.8),
+        0 4px 8px rgba(0, 9, 19, 0.9);
     }
 
     .cta-note {
@@ -786,25 +921,33 @@ const currentYear = new Date().getFullYear();
 
     .form-label {
       display: block;
-      font-size: 0.875rem;
+      font-size: 0.9rem;
       font-weight: 700;
-      color: var(--text);
+      color: var(--text-secondary);
       margin-bottom: 0.625rem;
-      letter-spacing: 0;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-shadow: 0 0 5px rgba(200, 170, 110, 0.4);
     }
 
     .input-group {
       display: flex;
       align-items: center;
-      background: var(--bg-card);
-      border: 1.5px solid var(--border);
-      border-radius: 0.5rem;
-      padding: 0.375rem 1rem;
-      transition: border-color 0.2s;
+      background: linear-gradient(145deg, rgba(0, 9, 19, 0.8), rgba(15, 35, 65, 0.6));
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 1.2rem;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      box-shadow: inset 0 2px 4px rgba(0, 9, 19, 0.5);
     }
 
     .input-group:focus-within {
-      border-color: var(--text-muted);
+      border-color: var(--border-hover);
+      background: linear-gradient(145deg, rgba(15, 35, 65, 0.9), rgba(200, 155, 60, 0.1));
+      box-shadow: 
+        inset 0 2px 4px rgba(0, 9, 19, 0.7),
+        0 0 20px rgba(200, 155, 60, 0.3),
+        0 4px 15px rgba(0, 9, 19, 0.4);
     }
 
     .input-field {
@@ -834,41 +977,75 @@ const currentYear = new Date().getFullYear();
     }
 
     .select-field {
-      background: var(--bg-card);
-      border: 1.5px solid var(--border);
-      border-radius: 0.5rem;
+      background: linear-gradient(145deg, rgba(0, 9, 19, 0.8), rgba(15, 35, 65, 0.6));
+      border: 2px solid var(--border);
+      border-radius: 8px;
       color: var(--text);
       font-size: 1rem;
-      padding: 0.875rem 1rem;
+      font-weight: 500;
+      padding: 1rem 1.2rem;
       outline: none;
       cursor: pointer;
-      transition: border-color 0.2s;
-      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
       width: 100%;
+      box-shadow: inset 0 2px 4px rgba(0, 9, 19, 0.5);
     }
 
     .select-field:focus {
-      border-color: var(--text-muted);
+      border-color: var(--border-hover);
+      background: linear-gradient(145deg, rgba(15, 35, 65, 0.9), rgba(200, 155, 60, 0.1));
+      box-shadow: 
+        inset 0 2px 4px rgba(0, 9, 19, 0.7),
+        0 0 20px rgba(200, 155, 60, 0.3),
+        0 4px 15px rgba(0, 9, 19, 0.4);
     }
 
     .btn-submit {
-      background: var(--text);
-      color: var(--bg-dark);
-      border: none;
-      border-radius: 500px;
-      padding: 1rem 2rem;
-      font-size: 1rem;
-      font-weight: 700;
+      background: linear-gradient(145deg, rgba(200, 155, 60, 0.9), rgba(200, 155, 60, 0.7));
+      color: #0F2341;
+      border: 2px solid rgba(200, 155, 60, 0.6);
+      border-radius: 12px;
+      padding: 1.2rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       cursor: pointer;
-      transition: transform 0.1s, background 0.2s;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
       display: block;
       width: 100%;
-      letter-spacing: 0.02em;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      box-shadow: 
+        0 4px 15px rgba(0, 9, 19, 0.4),
+        0 0 20px rgba(200, 155, 60, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-submit:hover::before {
+      left: 100%;
     }
 
     .btn-submit:hover {
-      transform: scale(1.02);
-      background: var(--gold);
+      transform: translateY(-3px);
+      background: linear-gradient(145deg, rgba(200, 155, 60, 1), rgba(200, 155, 60, 0.8));
+      border-color: rgba(200, 155, 60, 1);
+      box-shadow: 
+        0 8px 25px rgba(0, 9, 19, 0.6),
+        0 0 30px rgba(200, 155, 60, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
     }
 
     /* Footer */
@@ -952,12 +1129,12 @@ const currentYear = new Date().getFullYear();
       }
 
       .hero-title {
-        font-size: clamp(2.5rem, 12vw, 4rem);
+        font-size: clamp(2rem, 10vw, 3.5rem);
         margin-bottom: 1rem;
       }
 
       .year-badge {
-        font-size: clamp(1.5rem, 8vw, 2.5rem);
+        font-size: clamp(1.2rem, 6vw, 2rem);
       }
 
       .hero-subtitle {
