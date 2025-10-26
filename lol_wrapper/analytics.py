@@ -3,7 +3,6 @@
 from typing import Dict, List, Any, Optional
 from collections import Counter, defaultdict
 from datetime import datetime
-import calendar
 
 
 def calculate_kda(kills: int, deaths: int, assists: int) -> float:
@@ -410,21 +409,39 @@ def analyze_temporal_patterns(
     }
 
 
-def generate_wrapped_insights(stats: Dict[str, Any]) -> List[str]:
+def generate_wrapped_insights(
+    stats: Dict[str, Any],
+    total_matches_in_year: Optional[int] = None,
+    matches_analyzed: Optional[int] = None
+) -> List[str]:
     """
     Genera insights interesantes para el Wrapped.
     
     Args:
         stats: Estadísticas agregadas del jugador
+        total_matches_in_year: Total de partidas jugadas en el año (opcional)
+        matches_analyzed: Total de partidas analizadas (opcional)
     
     Returns:
         Lista de insights/frases para mostrar
     """
     insights = []
     
+    # Información sobre partidas totales vs analizadas (al inicio)
+    if total_matches_in_year is not None and matches_analyzed is not None:
+        if total_matches_in_year == matches_analyzed:
+            insights.append(f"📊 Analizamos todas tus {total_matches_in_year} partidas del año")
+        else:
+            insights.append(
+                f"📊 Jugaste {total_matches_in_year} partidas este año, "
+                f"analizamos las primeras {matches_analyzed}"
+            )
+    
     # Total de partidas
     if stats["total_games"] > 0:
-        insights.append(f"Jugaste {stats['total_games']} partidas este año")
+        # Si no agregamos la info arriba, agregar info básica
+        if total_matches_in_year is None:
+            insights.append(f"Jugaste {stats['total_games']} partidas este año")
         
         # Tiempo jugado
         hours = stats["total_playtime_minutes"] / 60

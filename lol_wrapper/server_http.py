@@ -24,8 +24,7 @@ try:
     from .client import RiotAPIClient
     from .analytics import (
         analyze_match_history, 
-        generate_wrapped_insights, 
-        filter_matches_by_year,
+        generate_wrapped_insights,
         analyze_challenges,
         generate_challenge_insights
     )
@@ -34,8 +33,7 @@ except ImportError:
     from lol_wrapper.client import RiotAPIClient
     from lol_wrapper.analytics import (
         analyze_match_history, 
-        generate_wrapped_insights, 
-        filter_matches_by_year,
+        generate_wrapped_insights,
         analyze_challenges,
         generate_challenge_insights
     )
@@ -771,23 +769,24 @@ async def get_player_wrapped(
         - 🏆 Desafíos y logros (puntos, percentiles, badges)
         - Insights y frases motivacionales (partidas + desafíos)
         - Stats detallados por campeón
+        - total_matches_in_year: Total EXACTO de partidas jugadas en el año
+        - matches_analyzed: Partidas que se analizaron con detalles (limitadas por max_matches)
     
     Example:
-        >>> get_player_wrapped("Faker", "KR1", "kr", 100, 2025)
+        >>> get_player_wrapped("Faker", "KR1", "kr", 5, 2025)
         {
             "player": {...},
             "year": 2025,
+            "total_matches_in_year": 342,  # Jugó 342 partidas en total en 2025
+            "matches_analyzed": 5,         # Solo analizamos las primeras 5
             "statistics": {
-                "total_games": 150,
-                "wins": 95,
-                "losses": 55,
-                "winrate": 63.33,
-                "avg_kda": 4.5,
+                "total_games": 5,  # Stats basadas solo en las 5 analizadas
                 ...
-            },
-            "insights": ["Jugaste 150 partidas...", ...],
-            ...
+            }
         }
+        
+        Nota: Primero obtenemos TODOS los IDs para contar el total exacto,
+        luego solo analizamos (obtener detalles) las primeras max_matches.
     """
     try:
         # Normalizar región
@@ -806,7 +805,6 @@ async def get_player_wrapped(
         top_masteries = await client.get_top_champion_masteries(puuid, 5, region)
         
         # 2. Calcular filtros de tiempo si se especifica año
-        from datetime import datetime
         start_time = None
         end_time = None
         if year and year > 0:
@@ -814,16 +812,16 @@ async def get_player_wrapped(
             start_time = int(datetime(year, 1, 1).timestamp())
             end_time = int(datetime(year + 1, 1, 1).timestamp())
         
-        # 3. Obtener TODAS las partidas del año con paginación
-        match_ids = []
+        # 3. Obtener TODOS los IDs de partidas del año (para saber el total exacto)
+        all_match_ids = []
         batch_size = 100  # Máximo por request de Riot
         offset = 0
         
-        while len(match_ids) < max_matches:
-            # Obtener batch de IDs
+        # Paginar hasta obtener TODOS los IDs del año
+        while True:
             batch = await client.get_match_history(
                 puuid, 
-                count=min(batch_size, max_matches - len(match_ids)),
+                count=batch_size,
                 start=offset,
                 region=region,
                 start_time=start_time,
@@ -834,16 +832,22 @@ async def get_player_wrapped(
                 # No hay más partidas
                 break
             
-            match_ids.extend(batch)
+            all_match_ids.extend(batch)
             offset += len(batch)
             
-            # Si el batch es menor que batch_size, no hay más partidas
+            # Si el batch retornó menos de 100, llegamos al final
             if len(batch) < batch_size:
                 break
         
-        # 4. Obtener detalles de todas las partidas (esto puede tomar tiempo)
+        # Total exacto de partidas del año
+        total_matches_in_year = len(all_match_ids)
+        
+        # Solo analizar las primeras max_matches partidas
+        match_ids = all_match_ids[:max_matches]
+        
+        # 4. Obtener detalles de las partidas a analizar (esto puede tomar tiempo)
         matches = []
-        for match_id in match_ids[:max_matches]:
+        for match_id in match_ids:
             try:
                 match_detail = await client.get_match_details(match_id, region)
                 matches.append(match_detail)
@@ -854,8 +858,12 @@ async def get_player_wrapped(
         # 5. Analizar estadísticas
         statistics = analyze_match_history(matches, puuid)
         
-        # 6. Generar insights de partidas
-        insights = generate_wrapped_insights(statistics)
+        # 6. Generar insights de partidas (con info de total vs analizadas)
+        insights = generate_wrapped_insights(
+            statistics,
+            total_matches_in_year=total_matches_in_year,
+            matches_analyzed=len(matches)
+        )
         
         # 7. Obtener y analizar desafíos
         challenges_data = None
@@ -888,7 +896,8 @@ async def get_player_wrapped(
             "statistics": statistics,
             "challenges": challenge_analysis,
             "insights": all_insights,
-            "matches_analyzed": len(matches),
+            "total_matches_in_year": total_matches_in_year,  # Total de partidas en el año
+            "matches_analyzed": len(matches),  # Partidas realmente analizadas (limitadas por max_matches)
             "generated_at": json.dumps(datetime.now().isoformat())
         }
         
