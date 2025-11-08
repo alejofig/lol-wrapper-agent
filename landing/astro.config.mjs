@@ -1,22 +1,15 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
-import tailwind from '@astrojs/tailwind';
+import tailwind from "@astrojs/tailwind";
+import react from "@astrojs/react";
 
+import node from "@astrojs/node";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [
-    react(),
-    tailwind()
-  ],
-  output: 'static', // Static site para AWS Amplify Hosting
-  server: {
-    port: 4321
-  },
-  vite: {
-    resolve: {
-      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
-    }
-  }
+  output: 'server',
+  integrations: [tailwind(), react()],
+  adapter: node({
+    mode: "standalone"
+  })
 });

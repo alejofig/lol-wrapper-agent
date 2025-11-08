@@ -634,11 +634,12 @@ async def get_player_challenges(
         region = normalize_region(region)
         
         # 1. Obtener PUUID del jugador
+        player_context = f"{game_name}-{tag_line}"
         account = await client.get_summoner_by_name(game_name, tag_line, region)
         puuid = account["puuid"]
         
         # 2. Obtener datos de desafíos
-        challenges_data = await client.get_player_challenges(puuid, region)
+        challenges_data = await client.get_player_challenges(puuid, region, s3_context=player_context)
         
         # 3. Analizar desafíos
         challenge_analysis = analyze_challenges(challenges_data)
@@ -702,18 +703,19 @@ async def get_player_profile_complete(
         region = normalize_region(region)
         
         # 1. Obtener info de cuenta (usa cluster regional automáticamente)
+        player_context = f"{game_name}-{tag_line}"
         account = await client.get_summoner_by_name(game_name, tag_line, region)
         puuid = account["puuid"]
         
         # 2. Obtener info de summoner (DEBE usar la región específica)
-        summoner = await client.get_summoner_by_puuid(puuid, region)
+        summoner = await client.get_summoner_by_puuid(puuid, region, s3_context=player_context)
         
         # 3. Obtener ranked info (ahora usa PUUID directamente)
-        ranked_info = await client.get_league_entries_by_puuid(puuid, region)
+        ranked_info = await client.get_league_entries_by_puuid(puuid, region, s3_context=player_context)
         
         # 4. Obtener maestría (DEBE usar la región específica)
-        mastery_score = await client.get_mastery_score(puuid, region)
-        top_masteries = await client.get_top_champion_masteries(puuid, 10, region)
+        mastery_score = await client.get_mastery_score(puuid, region, s3_context=player_context)
+        top_masteries = await client.get_top_champion_masteries(puuid, 10, region, s3_context=player_context)
         
         profile = {
             "account": account,
@@ -794,15 +796,16 @@ async def get_player_wrapped(
         max_matches = max(max_matches, 1)  # Mínimo 1
         
         # 1. Obtener perfil completo (TODAS las llamadas usan la misma región)
+        player_context = f"{game_name}-{tag_line}"
         account = await client.get_summoner_by_name(game_name, tag_line, region)
         puuid = account["puuid"]
         
-        summoner = await client.get_summoner_by_puuid(puuid, region)
+        summoner = await client.get_summoner_by_puuid(puuid, region, s3_context=player_context)
         
         # Obtener ranked info (ahora usa PUUID directamente)
-        ranked_info = await client.get_league_entries_by_puuid(puuid, region)
-        mastery_score = await client.get_mastery_score(puuid, region)
-        top_masteries = await client.get_top_champion_masteries(puuid, 5, region)
+        ranked_info = await client.get_league_entries_by_puuid(puuid, region, s3_context=player_context)
+        mastery_score = await client.get_mastery_score(puuid, region, s3_context=player_context)
+        top_masteries = await client.get_top_champion_masteries(puuid, 5, region, s3_context=player_context)
         
         # 2. Calcular filtros de tiempo si se especifica año
         start_time = None
@@ -825,7 +828,8 @@ async def get_player_wrapped(
                 start=offset,
                 region=region,
                 start_time=start_time,
-                end_time=end_time
+                end_time=end_time,
+                s3_context=player_context
             )
             
             if not batch:
@@ -849,7 +853,7 @@ async def get_player_wrapped(
         matches = []
         for match_id in match_ids:
             try:
-                match_detail = await client.get_match_details(match_id, region)
+                match_detail = await client.get_match_details(match_id, region, s3_context=player_context)
                 matches.append(match_detail)
             except Exception:
                 # Continuar si alguna partida falla
@@ -870,7 +874,7 @@ async def get_player_wrapped(
         challenge_analysis = None
         challenge_insights = []
         try:
-            challenges_data = await client.get_player_challenges(puuid, region)
+            challenges_data = await client.get_player_challenges(puuid, region, s3_context=player_context)
             challenge_analysis = analyze_challenges(challenges_data)
             challenge_insights = generate_challenge_insights(challenge_analysis)
         except Exception:

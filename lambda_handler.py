@@ -313,7 +313,7 @@ def lambda_handler(event, context):
                         game_name=game_name,
                         tag_line=tag_line,
                         region=region,
-                        max_matches=5,  # Reducido a 20 para evitar timeouts
+                        max_matches=200, 
                         year=2025
                     )
                 )
@@ -336,7 +336,22 @@ def lambda_handler(event, context):
                 )
                 
                 logger.info(f"✅ Wrapped generado exitosamente para {pk}")
-                
+
+                # Disparar el job de vectorización de forma asíncrona
+                try:
+                    lambda_client = boto3.client("lambda")
+                    player_identifier = pk.replace("PLAYER#", "").replace("#", "-")
+                    payload = {"player_identifier": player_identifier}
+                    
+                    lambda_client.invoke(
+                        FunctionName=os.getenv("VECTORIZER_LAMBDA_NAME", "lol-wrapped-vectorizer"),
+                        InvocationType="Event",  # Invocación asíncrona
+                        Payload=json.dumps(payload)
+                    )
+                    logger.info(f"🚀 Job de vectorización disparado para {player_identifier}")
+                except Exception as e:
+                    logger.error(f"Error al disparar el job de vectorización: {str(e)}")
+
             except Exception as e:
                 logger.error(f"❌ Error generando Wrapped: {str(e)}")
                 
@@ -383,10 +398,10 @@ if __name__ == "__main__":
                 "eventName": "INSERT",
                 "dynamodb": {
                     "NewImage": {
-                        "PK": {"S": "PLAYER#Kang Haerin#FOX"},
+                        "PK": {"S": "PLAYER#Elxs#LAN"},
                         "SK": {"S": "WRAPPED#2025"},
-                        "gameName": {"S": "Kang Haerin"},
-                        "tagLine": {"S": "FOX"},
+                        "gameName": {"S": "Elxs"},
+                        "tagLine": {"S": "LAN"},
                         "region": {"S": "la1"},
                         "status": {"S": "PROCESSING"},
                         "GSI1PK": {"S": "STATUS#PROCESSING"}

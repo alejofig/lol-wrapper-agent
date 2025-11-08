@@ -4,7 +4,15 @@ import httpx
 import asyncio
 from typing import Optional, List, Dict, Any
 from time import time
+import os
+import boto3
+import json
 
+from dotenv import load_dotenv
+load_dotenv()
+
+S3_BUCKET = os.getenv("S3_RAW_DATA_BUCKET")
+s3_client = boto3.client("s3") 
 
 class RiotAPIClient:
     """Cliente para la API de Riot Games."""
@@ -78,6 +86,56 @@ class RiotAPIClient:
         self._requests_per_2min = 95  # Slightly under 100 to be safe
         self._rate_limit_lock = asyncio.Lock()
     
+    async def _save_to_s3(self, url: str, data: Dict[str, Any], context_identifier: Optional[str] = None):
+        """Guarda la respuesta de la API en S3 si el bucket está configurado."""
+        if not S3_BUCKET or not data:
+            return
+
+        try:
+            # El context_identifier (ej: NamiNami-LAN) es la única fuente de verdad para el nombre de la carpeta.
+            player_folder = context_identifier.replace("#", "-") if context_identifier else "_global"
+            path = url.split("api.riotgames.com")[1].split("?")[0]
+
+            # Lógica para crear un nombre de archivo limpio y estructurado
+            filename = ""
+            if "/riot/account/v1/accounts/by-riot-id" in path:
+                filename = "account-info.json"
+            elif "/lol/summoner/v4/summoners/by-puuid" in path:
+                filename = "summoner-info.json"
+            elif "/lol/champion-mastery/v4/champion-masteries/by-puuid" in path:
+                if "/top" in path:
+                    filename = "mastery-top.json"
+                else:
+                    filename = "mastery-all.json"
+            elif "/lol/champion-mastery/v4/scores/by-puuid" in path:
+                filename = "mastery-score.json"
+            elif "/lol/league/v4/entries/by-puuid" in path:
+                filename = "league-entries.json"
+            elif "/lol/match/v5/matches/by-puuid" in path:
+                filename = "match-history.json"
+            elif "/lol/match/v5/matches/" in path and "/timeline" not in path:
+                match_id = path.split("/")[-1]
+                filename = f"matches/{match_id}.json"
+            elif "/lol/match/v5/matches/" in path and "/timeline" in path:
+                match_id = path.split("/")[-2]
+                filename = f"matches-timeline/{match_id}.json"
+            elif "/lol/challenges/v1/player-data" in path:
+                filename = "challenges-data.json"
+            
+            if not filename:
+                return
+
+            key = f"riot_api_responses/{player_folder}/{filename}"
+            
+            s3_client.put_object(
+                Bucket=S3_BUCKET,
+                Key=key,
+                Body=json.dumps(data, indent=2),
+                ContentType="application/json"
+            )
+        except Exception as e:
+            print(f"Error al guardar en S3 ({url}): {e}")
+    
     async def close(self):
         """Cierra el cliente HTTP."""
         await self.client.aclose()
@@ -134,7 +192,7 @@ class RiotAPIClient:
             # Registrar esta petición
             self._request_times.append(time())
     
-    async def _make_request(self, url: str, max_retries: int = 3) -> Dict[str, Any]:
+    async def _make_request(self, url: str, context_identifier: Optional[str] = None, max_retries: int = 3) -> Dict[str, Any]:
         """
         Realiza una petición a la API con rate limiting y retry logic.
         
@@ -156,7 +214,12 @@ class RiotAPIClient:
                 # Hacer la petición
                 response = await self.client.get(url)
                 response.raise_for_status()
-                return response.json()
+                json_response = response.json()
+
+                # Guardar en S3 de forma asíncrona con el contexto del jugador
+                await self._save_to_s3(url, json_response, context_identifier)
+
+                return json_response
                 
             except httpx.HTTPStatusError as e:
                 if e.response.status_code == 429:
@@ -197,12 +260,15 @@ class RiotAPIClient:
         cluster = self.PLATFORM_TO_CLUSTER.get(region.lower(), "americas")
         base_url = self._get_regional_url(cluster)
         url = f"{base_url}/riot/account/v1/accounts/by-riot-id/{game_name}/{tag_line}"
-        return await self._make_request(url)
+        # Usar game_name y tag_line como identificador único antes de tener el puuid
+        identifier = f"{game_name}-{tag_line}"
+        return await self._make_request(url, context_identifier=identifier)
     
     async def get_summoner_by_puuid(
         self,
         puuid: str,
-        region: Optional[str] = None
+        region: Optional[str] = None,
+        s3_context: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Obtiene información de un invocador por PUUID.
@@ -217,12 +283,13 @@ class RiotAPIClient:
         region = region or self.default_region
         base_url = self._get_platform_url(region)
         url = f"{base_url}/lol/summoner/v4/summoners/by-puuid/{puuid}"
-        return await self._make_request(url)
+        return await self._make_request(url, context_identifier=s3_context)
     
     async def get_champion_masteries(
         self,
         puuid: str,
-        region: Optional[str] = None
+        region: Optional[str] = None,
+        s3_context: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """
         Obtiene todas las maestrías de campeones de un jugador.
@@ -237,13 +304,14 @@ class RiotAPIClient:
         region = region or self.default_region
         base_url = self._get_platform_url(region)
         url = f"{base_url}/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid}"
-        return await self._make_request(url)
+        return await self._make_request(url, context_identifier=s3_context)
     
     async def get_champion_mastery(
         self,
         puuid: str,
         champion_id: int,
-        region: Optional[str] = None
+        region: Optional[str] = None,
+        s3_context: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Obtiene la maestría de un campeón específico.
@@ -259,13 +327,14 @@ class RiotAPIClient:
         region = region or self.default_region
         base_url = self._get_platform_url(region)
         url = f"{base_url}/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid}/by-champion/{champion_id}"
-        return await self._make_request(url)
+        return await self._make_request(url, context_identifier=s3_context)
     
     async def get_top_champion_masteries(
         self,
         puuid: str,
         count: int = 3,
-        region: Optional[str] = None
+        region: Optional[str] = None,
+        s3_context: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """
         Obtiene las top maestrías de campeones de un jugador.
@@ -282,12 +351,13 @@ class RiotAPIClient:
         count = min(count, 10)  # Límite de la API
         base_url = self._get_platform_url(region)
         url = f"{base_url}/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid}/top?count={count}"
-        return await self._make_request(url)
+        return await self._make_request(url, context_identifier=s3_context)
     
     async def get_mastery_score(
         self,
         puuid: str,
-        region: Optional[str] = None
+        region: Optional[str] = None,
+        s3_context: Optional[str] = None
     ) -> int:
         """
         Obtiene la puntuación total de maestría de un jugador.
@@ -302,7 +372,7 @@ class RiotAPIClient:
         region = region or self.default_region
         base_url = self._get_platform_url(region)
         url = f"{base_url}/lol/champion-mastery/v4/scores/by-puuid/{puuid}"
-        return await self._make_request(url)
+        return await self._make_request(url, context_identifier=s3_context)
     
     # ===== SUMMONER API v4 =====
     
@@ -352,7 +422,8 @@ class RiotAPIClient:
     async def get_league_entries_by_puuid(
         self,
         puuid: str,
-        region: Optional[str] = None
+        region: Optional[str] = None,
+        s3_context: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """
         Obtiene las entradas de liga (ranked) de un invocador por PUUID.
@@ -368,7 +439,7 @@ class RiotAPIClient:
         region = region or self.default_region
         base_url = self._get_platform_url(region)
         url = f"{base_url}/lol/league/v4/entries/by-puuid/{puuid}"
-        return await self._make_request(url)
+        return await self._make_request(url, context_identifier=s3_context)
     
     async def get_challenger_league(
         self,
@@ -439,7 +510,8 @@ class RiotAPIClient:
         start: int = 0,
         region: Optional[str] = None,
         start_time: Optional[int] = None,
-        end_time: Optional[int] = None
+        end_time: Optional[int] = None,
+        s3_context: Optional[str] = None
     ) -> List[str]:
         """
         Obtiene el historial de IDs de partidas de un jugador.
@@ -466,12 +538,13 @@ class RiotAPIClient:
         if end_time:
             url += f"&endTime={end_time}"
         
-        return await self._make_request(url)
+        return await self._make_request(url, context_identifier=s3_context)
     
     async def get_match_details(
         self,
         match_id: str,
-        region: Optional[str] = None
+        region: Optional[str] = None,
+        s3_context: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Obtiene los detalles completos de una partida.
@@ -487,12 +560,13 @@ class RiotAPIClient:
         cluster = self.PLATFORM_TO_CLUSTER.get(region.lower(), "americas")
         base_url = self._get_regional_url(cluster)
         url = f"{base_url}/lol/match/v5/matches/{match_id}"
-        return await self._make_request(url)
+        return await self._make_request(url, context_identifier=s3_context)
     
     async def get_match_timeline(
         self,
         match_id: str,
-        region: Optional[str] = None
+        region: Optional[str] = None,
+        s3_context: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Obtiene la línea de tiempo detallada de una partida.
@@ -508,14 +582,15 @@ class RiotAPIClient:
         cluster = self.PLATFORM_TO_CLUSTER.get(region.lower(), "americas")
         base_url = self._get_regional_url(cluster)
         url = f"{base_url}/lol/match/v5/matches/{match_id}/timeline"
-        return await self._make_request(url)
+        return await self._make_request(url, context_identifier=s3_context)
     
     # ===== SPECTATOR API v5 =====
     
     async def get_current_game(
         self,
         puuid: str,
-        region: Optional[str] = None
+        region: Optional[str] = None,
+        s3_context: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Obtiene información de la partida en curso de un jugador.
@@ -530,7 +605,7 @@ class RiotAPIClient:
         region = region or self.default_region
         base_url = self._get_platform_url(region)
         url = f"{base_url}/lol/spectator/v5/active-games/by-summoner/{puuid}"
-        return await self._make_request(url)
+        return await self._make_request(url, context_identifier=s3_context)
     
     async def get_featured_games(
         self,
@@ -659,7 +734,8 @@ class RiotAPIClient:
     async def get_player_challenges(
         self,
         puuid: str,
-        region: Optional[str] = None
+        region: Optional[str] = None,
+        s3_context: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Obtiene todos los desafíos de un jugador por PUUID.
@@ -679,5 +755,5 @@ class RiotAPIClient:
         region = region or self.default_region
         base_url = self._get_platform_url(region)
         url = f"{base_url}/lol/challenges/v1/player-data/{puuid}"
-        return await self._make_request(url)
+        return await self._make_request(url, context_identifier=s3_context)
 

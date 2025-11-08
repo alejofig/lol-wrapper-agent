@@ -1,0 +1,17 @@
+# Utiliza la imagen base oficial de AWS Lambda para Python
+FROM public.ecr.aws/lambda/python:3.12
+
+# Instalar uv (ultra-fast Python package installer)
+RUN pip install --no-cache-dir uv
+
+# Copia los archivos de tu aplicación al directorio de trabajo
+COPY . /var/task/
+
+# Copia el archivo de dependencias
+COPY requirements.txt ./
+
+# Instala las dependencias usando uv
+RUN uv pip install -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
+
+# Define el handler de Lambda
+CMD ["vectorizer.handler"]

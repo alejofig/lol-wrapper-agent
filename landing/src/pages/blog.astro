@@ -176,7 +176,21 @@ const currentYear = new Date().getFullYear();
               <span>MCP</span>
             </div>
           </div>
-
+ 
+          <div class="component-card">
+            <h3>🧠 Amazon S3 Vectors</h3>
+            <p>
+              Stores and indexes vector embeddings of your game data. 
+              Enables ultra-fast similarity searches to find the most 
+              relevant statistics for answering your natural language questions.
+            </p>
+            <div class="tech-tags">
+              <span>Vector Database</span>
+              <span>RAG</span>
+              <span>Embeddings</span>
+            </div>
+          </div>
+ 
         </div>
       </section>
 
@@ -222,6 +236,16 @@ const currentYear = new Date().getFullYear();
             <strong>Client Display:</strong> Frontend polls AppSync every 3 seconds, 
             detects completion, and renders your beautiful wrapped visualization.
           </li>
+          <li>
+            <strong>Data Vectorization:</strong> A Lambda function is triggered to process
+            the raw game data from S3, create vector embeddings using Bedrock,
+            and store them in an S3 Vectors index.
+          </li>
+          <li>
+            <strong>Conversational AI:</strong> You can now chat with your stats. Your
+            questions are sent to a RAG Agent Lambda, which queries S3 Vectors
+            for relevant data and uses Claude to generate a natural language answer.
+          </li>
         </ol>
       </section>
 
@@ -254,6 +278,27 @@ async def get_player_wrapped(
     # Fetch and analyze data...
     return wrapped_json</code></pre>
         </div>
+      </section>
+
+      <!-- RAG Agent Section -->
+      <section class="content-section">
+        <h2> Chat with Your Stats</h2>
+        <p>
+          Beyond visualization, we've introduced a brand new way to interact with your
+          League of Legends data: a conversational AI agent. You can now ask questions
+          in natural language and get instant answers based on your gameplay statistics.
+        </p>
+        <p>
+          This is made possible by a <strong>Retrieval-Augmented Generation (RAG)</strong> architecture:
+        </p>
+        <ul class="feature-list">
+          <li><strong>Vectorization:</strong> All your match data is converted into numerical representations (vectors) and stored in Amazon S3 Vectors.</li>
+          <li><strong>Retrieval:</strong> When you ask a question, the system searches S3 Vectors for the data chunks that are most semantically relevant to your query.</li>
+          <li><strong>Generation:</strong> This relevant data is provided to Claude 4.5 Sonnet along with your question, allowing the model to generate an accurate, contextualized answer.</li>
+        </ul>
+        <p>
+          Try it out on your Wrapped page and discover insights you've never seen before!
+        </p>
       </section>
 
       <!-- Performance -->
@@ -326,17 +371,6 @@ async def get_player_wrapped(
         </div>
       </section>
 
-      <!-- Future -->
-      <section class="content-section">
-        <h2>What's Next?</h2>
-        <ul class="feature-list">
-          <li>WebSocket subscriptions for true real-time updates</li>
-          <li>Social sharing with custom OG images</li>
-          <li>Multi-year comparison (compare 2024 vs 2025)</li>
-          <li>Team wrapped (aggregate stats for friend groups)</li>
-          <li>More AI-powered insights and predictions</li>
-        </ul>
-      </section>
 
       <!-- CTA -->
       <section class="content-section cta-section">
