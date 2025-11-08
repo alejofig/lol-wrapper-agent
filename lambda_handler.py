@@ -313,7 +313,7 @@ def lambda_handler(event, context):
                         game_name=game_name,
                         tag_line=tag_line,
                         region=region,
-                        max_matches=200, 
+                        max_matches=80, 
                         year=2025
                     )
                 )
