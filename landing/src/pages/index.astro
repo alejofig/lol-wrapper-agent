@@ -1,5 +1,6 @@
 ---
 // League of Legends Wrapped Landing Page
+export const prerender = true;
 const currentYear = new Date().getFullYear();
 ---
 
@@ -1235,7 +1236,7 @@ const currentYear = new Date().getFullYear();
   </style>
 
   <script>
-    // Handle form submission - Redirect to wrapped page
+    // Handle form submission - Redirect to wrapped page with query params
     document.querySelector('.search-form')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -1247,7 +1248,7 @@ const currentYear = new Date().getFullYear();
         return;
       }
       
-      // Redirect to wrapped page with query parameter
+      // Redirect to wrapped page using query params: /wrapped?player=GameName-TAG
       const playerParam = `${encodeURIComponent(gameName)}-${encodeURIComponent(tagLine)}`;
       window.location.href = `/wrapped?player=${playerParam}`;
     });

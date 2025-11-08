@@ -1,19 +1,26 @@
 version: 1
 applications:
   - appRoot: landing
-    frontend:
-      phases:
-        preBuild:
-          commands:
-            - npm ci
-        build:
-          commands:
-            - npm run build
-      artifacts:
-        baseDirectory: dist
-        files:
-          - '**/*'
-      cache:
-        paths:
-          - node_modules/**/*
+    platform:
+      framework: Astro (SSR)
+      startCommand: npm start
+    buildspec: |
+      version: 1
+      frontend:
+        phases:
+          preBuild:
+            commands:
+              - cd landing
+              - npm ci
+          build:
+            commands:
+              - cd landing
+              - npm run build
+        artifacts:
+          baseDirectory: landing/dist
+          files:
+            - '**/*'
+        cache:
+          paths:
+            - landing/node_modules/**/*
 

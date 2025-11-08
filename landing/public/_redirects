@@ -8,5 +8,5 @@
 /logo.png   /logo.png   200!
 /diagram.png   /diagram.png   200!
 
-# SPA fallback for everything else
-/*    /index.html   200
+# Wrapped SPA routing - serve wrapped/index.html for all wrapped routes
+/wrapped/*   /wrapped/index.html   200

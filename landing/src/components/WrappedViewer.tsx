@@ -25,15 +25,28 @@ export default function WrappedViewer({
   tagLine: propTagLine,
   initialData
 }: WrappedViewerProps) {
-  // Obtener gameName y tagLine de props o de query params
+  // Obtener gameName y tagLine de props, query params o path
   const getPlayerFromURL = () => {
     if (typeof window === 'undefined') return { gameName: '', tagLine: '' };
     
+    // 1. Intentar obtener de query params (?player=GameName-TAG)
     const urlParams = new URLSearchParams(window.location.search);
     const playerParam = urlParams.get('player');
     
     if (playerParam) {
       const parts = playerParam.split('-');
+      return {
+        gameName: decodeURIComponent(parts[0] || ''),
+        tagLine: decodeURIComponent(parts[1] || 'LAN')
+      };
+    }
+    
+    // 2. Intentar obtener del path (/wrapped/GameName-TAG)
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    if (pathSegments.length > 1 && pathSegments[0] === 'wrapped') {
+      // pathSegments[0] = 'wrapped', pathSegments[1] = 'GameName-TAG'
+      const playerSlug = pathSegments[1];
+      const parts = playerSlug.split('-');
       return {
         gameName: decodeURIComponent(parts[0] || ''),
         tagLine: decodeURIComponent(parts[1] || 'LAN')
